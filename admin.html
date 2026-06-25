@@ -232,10 +232,13 @@ async function cargarIntentos() {
     return;
   }
   count.textContent = `(${data.intentos.length})`;
-  let html = '<table><tr><th>Codigo</th><th>Dispositivo</th><th>Fecha</th><th>Accion</th></tr>';
+  let html = '<table><tr><th>Codigo</th><th>Motivo</th><th>Dispositivo</th><th>Fecha</th><th>Accion</th></tr>';
   data.intentos.forEach(i => {
-    const motivo = i.motivo === 'codigo_ya_usado' ? ' (ya usado)' : '';
-    html += `<tr><td><code>${i.codigo}</code>${motivo}</td><td><code style="font-size:11px">${i.dispositivo}</code></td><td>${new Date(i.fecha).toLocaleString()}</td><td><button class="btn btn-sm btn-danger" onclick="bloquear('${i.codigo}')">Bloquear</button></td></tr>`;
+    let motivoTxt = 'Codigo invalido';
+    if (i.motivo === 'codigo_ya_usado') motivoTxt = 'Ya usado (mismo disp.)';
+    else if (i.motivo === 'compartido_a_otro') motivoTxt = 'Compartido a otro dispositivo';
+    else if (i.motivo === 'reintento_mismo') motivoTxt = 'Reintento del mismo disp.';
+    html += `<tr><td><code>${i.codigo}</code></td><td>${motivoTxt}</td><td><code style="font-size:11px">${i.dispositivo}</code></td><td>${new Date(i.fecha).toLocaleString()}</td><td><button class="btn btn-sm btn-danger" onclick="bloquear('${i.codigo}')">Bloquear</button></td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;

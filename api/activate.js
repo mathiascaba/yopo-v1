@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     if (!codeData) {
       if (!contenido.intentos_fallidos) contenido.intentos_fallidos = [];
       contenido.intentos_fallidos.push({
-        codigo, dispositivo, fecha: new Date().toISOString()
+        codigo, dispositivo, fecha: new Date().toISOString(), motivo: 'codigo_invalido'
       });
       await guardar(contenido, sha);
       return res.status(400).json({ error: 'Codigo invalido' });
@@ -22,11 +22,18 @@ module.exports = async (req, res) => {
     if (codeData.blocked) return res.status(400).json({ error: 'Codigo bloqueado' });
 
     if (codeData.used) {
+      const mismoDispositivo = codeData.dispositivo === dispositivo;
       if (!contenido.intentos_fallidos) contenido.intentos_fallidos = [];
       contenido.intentos_fallidos.push({
-        codigo, dispositivo, fecha: new Date().toISOString(), motivo: 'codigo_ya_usado'
+        codigo, dispositivo, fecha: new Date().toISOString(), motivo: mismoDispositivo ? 'reintento_mismo' : 'compartido_a_otro'
       });
+      if (!mismoDispositivo) {
+        codeData.blocked = true;
+      }
       await guardar(contenido, sha);
+      if (!mismoDispositivo) {
+        return res.status(400).json({ error: 'Codigo bloqueado' });
+      }
       return res.status(400).json({ error: 'Codigo ya usado' });
     }
 
