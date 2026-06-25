@@ -15,7 +15,7 @@
     },
     "GGM6HX02": {
       "used": true,
-      "blocked": false,
+      "blocked": true,
       "creado": "2026-06-25T22:03:37.362Z",
       "dispositivo": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
       "fecha_uso": "2026-06-25T22:03:46.108Z"
