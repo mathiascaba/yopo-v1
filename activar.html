@@ -60,6 +60,23 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
     document.getElementById('bloqueadoMsg').style.display = 'block';
     document.querySelector('.input-group').style.display = 'none';
     document.getElementById('btnActivar').style.display = 'none';
+    return;
+  }
+
+  const deviceId = localStorage.getItem('device_id');
+  if (deviceId) {
+    fetch('/api/verify?dispositivo=' + encodeURIComponent(deviceId))
+      .then(r => r.json())
+      .then(d => {
+        if (d.bloqueado) {
+          document.getElementById('bloqueadoMsg').style.display = 'block';
+          document.querySelector('.input-group').style.display = 'none';
+          document.getElementById('btnActivar').style.display = 'none';
+        } else if (d.activado) {
+          window.location.replace('inicio.html');
+        }
+      })
+      .catch(() => {});
   }
 })();
 
