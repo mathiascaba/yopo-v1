@@ -232,9 +232,10 @@ async function cargarIntentos() {
     return;
   }
   count.textContent = `(${data.intentos.length})`;
-  let html = '<table><tr><th>Codigo</th><th>Dispositivo</th><th>Fecha</th></tr>';
+  let html = '<table><tr><th>Codigo</th><th>Dispositivo</th><th>Fecha</th><th>Accion</th></tr>';
   data.intentos.forEach(i => {
-    html += `<tr><td><code>${i.codigo}</code></td><td><code style="font-size:11px">${i.dispositivo}</code></td><td>${new Date(i.fecha).toLocaleString()}</td></tr>`;
+    const motivo = i.motivo === 'codigo_ya_usado' ? ' (ya usado)' : '';
+    html += `<tr><td><code>${i.codigo}</code>${motivo}</td><td><code style="font-size:11px">${i.dispositivo}</code></td><td>${new Date(i.fecha).toLocaleString()}</td><td><button class="btn btn-sm btn-danger" onclick="bloquear('${i.codigo}')">Bloquear</button></td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;
