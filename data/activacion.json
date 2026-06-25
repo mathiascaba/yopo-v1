@@ -22,9 +22,11 @@
       "fecha_uso": "2026-06-25T22:03:46.108Z"
     },
     "YDLA4XJA": {
-      "used": false,
+      "used": true,
       "blocked": false,
-      "creado": "2026-06-25T22:13:01.831Z"
+      "creado": "2026-06-25T22:13:01.831Z",
+      "dispositivo": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
+      "fecha_uso": "2026-06-25T22:13:07.467Z"
     }
   },
   "dispositivos": [
@@ -42,6 +44,11 @@
       "id": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
       "codigo": "GGM6HX02",
       "fecha": "2026-06-25T22:03:46.108Z"
+    },
+    {
+      "id": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
+      "codigo": "YDLA4XJA",
+      "fecha": "2026-06-25T22:13:07.468Z"
     }
   ],
   "intentos_fallidos": [
