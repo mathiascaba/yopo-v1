@@ -1,5 +1,10 @@
 {
-  "codes": {},
+  "codes": {
+    "WPHAJ1J5": {
+      "used": false,
+      "creado": "2026-06-25T21:53:19.513Z"
+    }
+  },
   "dispositivos": [],
   "intentos_fallidos": []
 }
