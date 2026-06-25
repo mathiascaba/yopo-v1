@@ -9,9 +9,15 @@ module.exports = async (req, res) => {
   try {
     const { contenido } = await leer();
     const dispositivoData = contenido.dispositivos?.find(d => d.id === dispositivo) || null;
+    let bloqueado = false;
+    if (dispositivoData) {
+      const codeData = contenido.codes[dispositivoData.codigo];
+      bloqueado = codeData?.blocked === true;
+    }
 
     return res.json({
       activado: !!dispositivoData,
+      bloqueado,
       data: dispositivoData
     });
 

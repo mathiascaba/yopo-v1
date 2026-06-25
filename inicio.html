@@ -6,6 +6,18 @@
         localStorage.setItem('sesion_iniciada', 'true');
         localStorage.setItem('pase_vip_activo', 'true');
     }
+    (async function() {
+        const deviceId = localStorage.getItem('device_id');
+        if (deviceId) {
+            try {
+                const r = await fetch('/api/verify?dispositivo=' + encodeURIComponent(deviceId));
+                const d = await r.json();
+                if (d.bloqueado) {
+                    window.location.replace('activar.html?bloqueado=1');
+                }
+            } catch(e) {}
+        }
+    })();
     </script>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="img/favicon.png" type="image/png">

@@ -21,6 +21,7 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
 .btn:disabled { background: #ccc; cursor: not-allowed; }
 .error { color: #d32f2f; font-size: 13px; margin-top: 12px; display: none; }
 .error-big { color: #d32f2f; font-size: 22px; font-weight: 800; margin-top: 16px; display: none; text-transform: uppercase; letter-spacing: 2px; }
+.bloqueado-msg { display: none; margin-top: 16px; }
 .success { color: #2e7d32; font-size: 13px; margin-top: 12px; display: none; }
 .loader { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; margin: 0 auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -44,10 +45,24 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
 
   <div class="error" id="errorMsg"></div>
   <div class="error-big" id="errorBigMsg"></div>
+  <div class="bloqueado-msg" id="bloqueadoMsg">
+    <i class="fas fa-ban" style="font-size:48px;color:#d32f2f;display:block;margin-bottom:12px"></i>
+    <div style="font-size:20px;font-weight:800;color:#d32f2f;text-transform:uppercase;letter-spacing:1px">Codigo de activacion bloqueado</div>
+    <div style="font-size:14px;color:#888;margin-top:8px">Contactar a soporte</div>
+  </div>
   <div class="success" id="successMsg"></div>
 </div>
 
 <script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('bloqueado') === '1') {
+    document.getElementById('bloqueadoMsg').style.display = 'block';
+    document.querySelector('.input-group').style.display = 'none';
+    document.getElementById('btnActivar').style.display = 'none';
+  }
+})();
+
 function getDeviceId() {
   let id = localStorage.getItem('device_id');
   if (!id) {
@@ -120,6 +135,7 @@ function mostrarErrorBig(msg) {
 function ocultarError() {
   document.getElementById('errorMsg').style.display = 'none';
   document.getElementById('errorBigMsg').style.display = 'none';
+  document.getElementById('bloqueadoMsg').style.display = 'none';
 }
 
 document.getElementById('codigoInput').addEventListener('keydown', e => {
