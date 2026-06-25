@@ -194,7 +194,7 @@ async function cargarCodigos() {
     let accion = '';
     if (c.blocked) {
       accion = `<button class="btn btn-sm btn-primary" onclick="desbloquear('${c.codigo}')">Desbloquear</button>`;
-    } else if (!c.used) {
+    } else {
       accion = `<button class="btn btn-sm btn-danger" onclick="bloquear('${c.codigo}')">Bloquear</button>`;
     }
 
