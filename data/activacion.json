@@ -5,6 +5,11 @@
       "creado": "2026-06-25T21:53:19.513Z",
       "dispositivo": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
       "fecha_uso": "2026-06-25T21:53:37.456Z"
+    },
+    "CCSY4115": {
+      "used": false,
+      "blocked": false,
+      "creado": "2026-06-25T22:00:09.415Z"
     }
   },
   "dispositivos": [
