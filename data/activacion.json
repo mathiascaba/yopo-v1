@@ -1,10 +1,18 @@
 {
   "codes": {
     "WPHAJ1J5": {
-      "used": false,
-      "creado": "2026-06-25T21:53:19.513Z"
+      "used": true,
+      "creado": "2026-06-25T21:53:19.513Z",
+      "dispositivo": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
+      "fecha_uso": "2026-06-25T21:53:37.456Z"
     }
   },
-  "dispositivos": [],
+  "dispositivos": [
+    {
+      "id": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
+      "codigo": "WPHAJ1J5",
+      "fecha": "2026-06-25T21:53:37.456Z"
+    }
+  ],
   "intentos_fallidos": []
 }
