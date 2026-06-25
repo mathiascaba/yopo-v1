@@ -19,7 +19,16 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Codigo invalido' });
     }
 
-    if (codeData.used) return res.status(400).json({ error: 'Codigo ya usado' });
+    if (codeData.blocked) return res.status(400).json({ error: 'Codigo bloqueado' });
+
+    if (codeData.used) {
+      if (!contenido.intentos_fallidos) contenido.intentos_fallidos = [];
+      contenido.intentos_fallidos.push({
+        codigo, dispositivo, fecha: new Date().toISOString(), motivo: 'codigo_ya_usado'
+      });
+      await guardar(contenido, sha);
+      return res.status(400).json({ error: 'Codigo ya usado' });
+    }
 
     codeData.used = true;
     codeData.dispositivo = dispositivo;

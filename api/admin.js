@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
       const generados = [];
       for (let i = 0; i < cantidad; i++) {
         const c = generarCodigo();
-        contenido.codes[c] = { used: false, creado: new Date().toISOString() };
+        contenido.codes[c] = { used: false, blocked: false, creado: new Date().toISOString() };
         generados.push(c);
       }
       await guardar(contenido, sha);
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
 
     } else if (method === 'GET' && req.query?.action === 'codigos') {
       const lista = Object.entries(contenido.codes || {}).map(([c, d]) => ({
-        codigo: c, used: d.used, creado: d.creado,
+        codigo: c, used: d.used, blocked: d.blocked || false, creado: d.creado,
         dispositivo: d.dispositivo || null, fecha_uso: d.fecha_uso || null
       }));
       return res.json({ codigos: lista });
@@ -40,6 +40,20 @@ module.exports = async (req, res) => {
 
     } else if (method === 'GET' && req.query?.action === 'dispositivos') {
       return res.json({ dispositivos: contenido.dispositivos || [] });
+
+    } else if (method === 'POST' && req.body?.action === 'block') {
+      const codigo = req.body.codigo;
+      if (!codigo || !contenido.codes[codigo]) return res.status(400).json({ error: 'Codigo no encontrado' });
+      contenido.codes[codigo].blocked = true;
+      await guardar(contenido, sha);
+      return res.json({ success: true, message: 'Codigo bloqueado' });
+
+    } else if (method === 'POST' && req.body?.action === 'unblock') {
+      const codigo = req.body.codigo;
+      if (!codigo || !contenido.codes[codigo]) return res.status(400).json({ error: 'Codigo no encontrado' });
+      contenido.codes[codigo].blocked = false;
+      await guardar(contenido, sha);
+      return res.json({ success: true, message: 'Codigo desbloqueado' });
 
     } else {
       return res.status(400).json({ error: 'Accion no valida' });

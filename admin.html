@@ -33,6 +33,7 @@ td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
 .badge-ok { background: #e8f5e9; color: #2e7d32; }
 .badge-used { background: #fff3e0; color: #e65100; }
+.badge-blocked { background: #ffebee; color: #b71c1c; }
 .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .tab { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 13px; transition: .2s; }
 .tab.active { background: #742385; color: white; border-color: #742385; }
@@ -157,6 +158,22 @@ function copiarCodigos() {
   }
 }
 
+async function bloquear(codigo) {
+  await api('/api/admin', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'block', codigo })
+  });
+  cargarCodigos();
+}
+
+async function desbloquear(codigo) {
+  await api('/api/admin', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'unblock', codigo })
+  });
+  cargarCodigos();
+}
+
 async function cargarCodigos() {
   const data = await api('/api/admin?action=codigos');
   const container = document.getElementById('codigosList');
@@ -167,10 +184,21 @@ async function cargarCodigos() {
     return;
   }
   count.textContent = `(${data.codigos.length})`;
-  let html = '<table><tr><th>Codigo</th><th>Estado</th><th>Dispositivo</th><th>Fecha uso</th></tr>';
+  let html = '<table><tr><th>Codigo</th><th>Estado</th><th>Dispositivo</th><th>Fecha uso</th><th>Accion</th></tr>';
   data.codigos.forEach(c => {
-    const badge = c.used ? '<span class="badge badge-used">Usado</span>' : '<span class="badge badge-ok">Disponible</span>';
-    html += `<tr><td><code>${c.codigo}</code></td><td>${badge}</td><td>${c.dispositivo || '-'}</td><td>${c.fecha_uso ? new Date(c.fecha_uso).toLocaleString() : '-'}</td></tr>`;
+    let badge;
+    if (c.blocked) badge = '<span class="badge badge-blocked">Bloqueado</span>';
+    else if (c.used) badge = '<span class="badge badge-used">Usado</span>';
+    else badge = '<span class="badge badge-ok">Disponible</span>';
+
+    let accion = '';
+    if (c.blocked) {
+      accion = `<button class="btn btn-sm btn-primary" onclick="desbloquear('${c.codigo}')">Desbloquear</button>`;
+    } else if (!c.used) {
+      accion = `<button class="btn btn-sm btn-danger" onclick="bloquear('${c.codigo}')">Bloquear</button>`;
+    }
+
+    html += `<tr><td><code>${c.codigo}</code></td><td>${badge}</td><td>${c.dispositivo || '-'}</td><td>${c.fecha_uso ? new Date(c.fecha_uso).toLocaleString() : '-'}</td><td>${accion}</td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;

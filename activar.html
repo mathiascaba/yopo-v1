@@ -20,6 +20,7 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { background: #ccc; cursor: not-allowed; }
 .error { color: #d32f2f; font-size: 13px; margin-top: 12px; display: none; }
+.error-big { color: #d32f2f; font-size: 22px; font-weight: 800; margin-top: 16px; display: none; text-transform: uppercase; letter-spacing: 2px; }
 .success { color: #2e7d32; font-size: 13px; margin-top: 12px; display: none; }
 .loader { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; margin: 0 auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -42,6 +43,7 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
   </button>
 
   <div class="error" id="errorMsg"></div>
+  <div class="error-big" id="errorBigMsg"></div>
   <div class="success" id="successMsg"></div>
 </div>
 
@@ -87,6 +89,8 @@ async function activar() {
       document.getElementById('successMsg').textContent = '¡Dispositivo activado con exito! Redirigiendo...';
       localStorage.setItem('activado', 'true');
       setTimeout(() => window.location.href = 'inicio.html', 1500);
+    } else if (data.error === 'Codigo bloqueado') {
+      mostrarErrorBig('Codigo bloqueado');
     } else {
       mostrarError(data.error || 'Error al activar');
     }
@@ -100,13 +104,22 @@ async function activar() {
 }
 
 function mostrarError(msg) {
+  ocultarError();
   const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function mostrarErrorBig(msg) {
+  ocultarError();
+  const el = document.getElementById('errorBigMsg');
   el.textContent = msg;
   el.style.display = 'block';
 }
 
 function ocultarError() {
   document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('errorBigMsg').style.display = 'none';
 }
 
 document.getElementById('codigoInput').addEventListener('keydown', e => {
