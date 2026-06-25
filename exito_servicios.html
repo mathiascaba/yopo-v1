@@ -1,0 +1,459 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Yapeo Servicio Exitoso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --brand-purple: #742284;
+            --brand-teal: #00BFA5;
+            --main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* RESET TOTAL */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; outline: none;
+        }
+
+        body {
+            font-family: var(--main-font);
+            background: linear-gradient(180deg, #581c78 0%, #742284 100%);
+            background-attachment: fixed;
+            color: #333;
+            min-height: 100dvh;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 15px;
+            z-index: 10;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px 20px 5px;
+        }
+
+        .logo-header-img {
+            height: 80px; /* TAMAÑO AUMENTADO */
+            object-fit: contain;
+            display: block;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* --- Tarjeta Blanca Principal --- */
+        .success-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px 20px 30px 20px; 
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 20;
+            margin-bottom: 0; 
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 5px;
+            gap: 10px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--brand-purple);
+            line-height: 1.1;
+            flex: 1; 
+        }
+
+        .share-btn {
+            color: var(--brand-teal);
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .icon-share {
+            width: 18px;
+            height: 18px;
+            margin-right: 5px;
+            object-fit: contain;
+        }
+
+        .amount {
+            font-size: 50px; /* TAMAÑO MANTENIDO EN 50px COMO PEDISTE */
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-top: 10px;
+        }
+        .amount span {
+            font-size: 25px; /* SÍMBOLO S/ A 25px COMO PEDISTE */
+            font-weight: 600;
+            margin-right: 4px;
+            margin-top: 8px;
+            color: #555;
+        }
+
+        .company-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        .date-time-container {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .icon-datetime {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            object-fit: contain;
+            opacity: 0.6;
+        }
+        
+        .dt-separator { margin: 0 10px; color: #ccc; }
+
+        .details-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline; 
+            margin-bottom: 14px;
+            font-size: 16px;
+        }
+
+        .detail-title {
+            color: #666;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .detail-value {
+            color: #222;
+            font-weight: 600;
+            text-align: right;
+            flex: 1;
+            word-break: break-word; 
+        }
+
+        /* --- Estilo de Cajas de Código (Aunque no estén visibles, se ajustan por si acaso) --- */
+        .code-box { 
+            background: #f5f5f5; 
+            padding: 2px 7px; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            color: #333; 
+            font-size: 18px; /* TAMAÑO AUMENTADO */
+            letter-spacing: 1px; 
+        } 
+
+        /* --- Botón Inferior --- */
+        .btn-new-service {
+            background-color: var(--brand-teal);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 17px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px; 
+            box-shadow: 0 4px 12px rgba(0, 191, 165, 0.4);
+            text-decoration: none;
+        }
+
+        .btn-new-service i { margin-right: 10px; font-size: 22px; }
+        
+        /* Contenedor animación */
+        #burst-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #burst-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <img src="img/animationyape.gif" alt="Yape" class="logo-header-img" id="logoGif">
+            <img src="img/LogoYape.svg" alt="Yape" class="logo-header-img" id="logoStatic" style="display: none;">
+
+            <a href="inicio.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+
+        <div id="burst-container">
+            <img id="burst-image" src="" alt="Confeti">
+        </div>
+
+        <div class="success-card">
+            <div class="card-header-row">
+                <div class="title">¡Yapeaste el servicio!</div>
+                <button class="share-btn" onclick="compartirVoucher()">
+                    <img src="img/compartiricon.png" alt="Share" class="icon-share"> 
+                    Compartir
+                </button>
+            </div>
+            
+            <div class="amount">
+                <span>S/</span> <div id="finalAmount">0.00</div>
+            </div>
+
+            <div class="company-name" id="companyName">Empresa</div>
+
+            <div class="date-time-container">
+                <img src="img/fecha-icon.svg" alt="Fecha" class="icon-datetime">
+                <span id="dateText">-- ---. ----</span>
+                
+                <span class="dt-separator">|</span>
+                
+                <img src="img/hora-icon.svg" alt="Hora" class="icon-datetime">
+                <span id="timeText">--:--</span>
+            </div>
+
+            <div class="details-label">DATOS DE LA TRANSACCIÓN</div>
+            
+            <div class="detail-row">
+                <span class="detail-title">Servicio:</span>
+                <span class="detail-value" id="serviceName">Nombre Servicio</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-title">Código de cliente:</span>
+                <span class="detail-value" id="clientCode">000000</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-title">Titular:</span>
+                <span class="detail-value" id="holderName">Nombre Titular</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-title">Nº de operación:</span>
+                <span class="detail-value" id="opNumber">00000000</span>
+            </div>
+        </div>
+
+        <a href="servicios.html" class="btn-new-service">
+            <img src="img/iconservv.svg" alt="Servicio" style="margin-right: 10px; width: 22px; height: 22px; filter: brightness(0) invert(1);"> Yapear otro servicio 
+        </a>
+
+    </div>
+
+    <script>
+        // --- 1. ANIMACIÓN SECUENCIAL ---
+        window.addEventListener('load', () => {
+            const imgElement = document.getElementById('burst-image');
+            
+            const frameNames = [
+                'download.png', 'download1.png', 'download2.png', 'download3.png', 'download4.png',
+                'download5.png', 'download6.png', 'download7.png', 'download8.png', 'download9.png',
+                'download10.png', 'download11.png', 'download13.png', 'download14.png' 
+            ];
+
+            const preloadedImages = [];
+            frameNames.forEach(name => {
+                const img = new Image();
+                img.src = 'img/' + name;
+                preloadedImages.push(img);
+            });
+
+            function playSequence() {
+                imgElement.style.display = 'block';
+                let currentFrame = 0;
+                
+                const interval = setInterval(() => {
+                    if (currentFrame >= frameNames.length) {
+                        clearInterval(interval);
+                        imgElement.style.display = 'none';
+                        return;
+                    }
+                    imgElement.src = 'img/' + frameNames[currentFrame];
+                    currentFrame++;
+                }, 70);
+            }
+
+            setTimeout(playSequence, 200);
+        });
+
+        // --- 2. Lógica de Datos ---
+        const params = new URLSearchParams(window.location.search);
+        const empresa = decodeURIComponent(params.get('empresa') || "Empresa");
+        const monto = params.get('monto') || "0.00";
+        const servicio = decodeURIComponent(params.get('servicio') || "Servicio");
+        const codigo = params.get('codigo') || "000000";
+        const titular = decodeURIComponent(params.get('titular') || "TITULAR");
+
+        document.getElementById('companyName').textContent = empresa;
+        document.getElementById('finalAmount').textContent = parseFloat(monto).toFixed(2);
+        document.getElementById('serviceName').textContent = servicio;
+        document.getElementById('clientCode').textContent = codigo;
+        document.getElementById('holderName').textContent = titular;
+
+        const now = new Date();
+        const optionsDate = { day: 'numeric', month: 'short', year: 'numeric' };
+        const dateStr = now.toLocaleDateString('es-ES', optionsDate);
+        
+        let hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'p. m.' : 'a. m.';
+        hours = hours % 12; hours = hours ? hours : 12;
+        const timeStr = `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+        
+        document.getElementById('dateText').textContent = dateStr;
+        document.getElementById('timeText').textContent = timeStr;
+
+        document.getElementById('opNumber').textContent = Math.floor(10000000 + Math.random() * 90000000).toString().padStart(8, '0');
+
+        // --- 3. LÓGICA DE COMPARTIR VOUCHER (ACTUALIZADA CON LOGO) ---
+        function prepararParaFoto(esParaFoto) {
+            const shareBtn = document.querySelector('.share-btn');
+            const closeBtn = document.querySelector('.close-btn');
+            const btnNewService = document.querySelector('.btn-new-service');
+            
+            // Elementos del Logo
+            const logoGif = document.getElementById('logoGif');
+            const logoStatic = document.getElementById('logoStatic');
+            
+            if (esParaFoto) {
+                // Ocultamos la X y el botón Compartir sutilmente
+                if(shareBtn) shareBtn.style.visibility = 'hidden';
+                if(closeBtn) closeBtn.style.visibility = 'hidden';
+                // Ocultamos el botón grande inferior por completo
+                if(btnNewService) btnNewService.style.display = 'none';
+                
+                // Cambiamos el GIF por la imagen estática
+                if(logoGif) logoGif.style.display = 'none';
+                if(logoStatic) logoStatic.style.display = 'block';
+            } else {
+                if(shareBtn) shareBtn.style.visibility = 'visible';
+                if(closeBtn) closeBtn.style.visibility = 'visible';
+                if(btnNewService) btnNewService.style.display = 'flex';
+                
+                // Devolvemos el GIF y ocultamos la estática
+                if(logoGif) logoGif.style.display = 'block';
+                if(logoStatic) logoStatic.style.display = 'none';
+            }
+        }
+
+        function compartirVoucher() {
+            prepararParaFoto(true);
+
+            setTimeout(() => {
+                html2canvas(document.body, { 
+                    backgroundColor: '#742284', // Se captura con el fondo morado original
+                    scale: 2 
+                }).then(canvas => {
+                    canvas.toBlob(blob => {
+                        let nombreParaArchivo = document.getElementById('companyName').textContent.replace(/[^a-zA-Z0-9]/g, "_");
+                        const file = new File([blob], `Yape_Servicio_${nombreParaArchivo}.png`, { type: 'image/png' });
+                        
+                        // Compartir nativo
+                        if (navigator.share) {
+                            navigator.share({
+                                title: `Pago de Servicio a ${nombreParaArchivo}`,
+                                files: [file]
+                            }).then(() => {
+                                prepararParaFoto(false);
+                            }).catch(err => {
+                                console.log('Error al compartir:', err);
+                                prepararParaFoto(false);
+                            });
+                        } else {
+                            // Descargar si no tiene función de compartir
+                            const link = document.createElement('a');
+                            link.download = `Yape_Servicio_${nombreParaArchivo}.png`;
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                            prepararParaFoto(false);
+                        }
+                    });
+                });
+            }, 150); // Tiempo para que se aplique el ocultamiento
+        }
+    </script>
+</body>
+</html>

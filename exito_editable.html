@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Yapeo Exitoso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --brand-purple: #742284;
+            --brand-teal: #00BFA5;
+            --bg-gray-bubble: #f2f3f5;
+            --text-dark: #333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(180deg, #581c78 0%, #742284 100%);
+            background-attachment: fixed; 
+            color: var(--text-dark);
+            min-height: 100dvh;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            width: 100%; min-height: 100dvh; display: flex; flex-direction: column; position: relative; padding: 10px 15px; z-index: 10;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 0px 5px 5px 5px; }
+        .logo-header-img { height: 80px; object-fit: contain; display: block; }
+        .close-btn { width: 30px; height: 30px; background-color: rgba(255, 255, 255, 0.25); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 18px; text-decoration: none; cursor: pointer; }
+
+        .success-card {
+            background-color: white; border-radius: 20px; padding: 15px 20px 20px 20px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 10px; position: relative; z-index: 20; 
+        }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .yapeaste-title { color: var(--brand-purple); font-size: 24px; font-weight: 500; }
+        .share-btn { display: flex; align-items: center; color: var(--brand-teal); font-weight: 700; font-size: 15px; cursor: pointer; background: none; border: none; }
+        .icon-share { width: 16px; height: 16px; margin-right: 5px; object-fit: contain; }
+
+        .amount-section { margin-bottom: 10px; }
+        .currency { font-size: 25px; font-weight: 600; color: #555; vertical-align: top; margin-right: 2px; }
+        .amount-value { font-size: 50px; font-weight: 500; color: #333; line-height: 1; }
+
+        .recipient-name { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 5px; }
+        
+        .date-time { font-size: 14px; color: #777; margin-bottom: 15px; display: flex; align-items: center; }
+        .icon-datetime { width: 14px; height: 14px; margin-right: 5px; object-fit: contain; opacity: 0.6; }
+        .separator { margin: 0 8px; color: #ddd; }
+
+        .message-bubble { background-color: var(--bg-gray-bubble); border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; display: none; align-items: flex-start; }
+        .msg-icon-img { width: 16px; height: 16px; margin-right: 8px; margin-top: 2px; object-fit: contain; }
+        .msg-text { color: #333; font-size: 14px; font-weight: 500; word-break: break-word; }
+
+        .full-divider { width: 100%; height: 1px; background-color: #e0e0e0; margin: 15px 0; }
+
+        .code-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .code-title { font-size: 12px; font-weight: 700; color: #777; display: flex; align-items: center; text-transform: uppercase; } 
+        .icon-info { width: 14px; height: 14px; margin-left: 4px; object-fit: contain; }
+        .code-boxes { display: flex; gap: 6px; }
+        .code-box { background: #f5f5f5; padding: 2px 7px; border-radius: 6px; font-weight: 700; color: #333; font-size: 18px; letter-spacing: 1px; } 
+
+        .code-title-section { font-size: 12px; font-weight: 700; color: #777; margin-bottom: 12px; text-transform: uppercase; }
+        .details-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 20px; font-size: 16px; color: #555; }
+        .label { font-weight: 400; color: #666; }
+        .value { font-weight: 500; color: #000; text-align: right; }
+
+        .action-buttons { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0px; }
+        .btn-new-yape { background-color: var(--brand-teal); color: white; border: none; border-radius: 8px; padding: 13px; font-size: 16px; font-weight: 700; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 191, 165, 0.3); text-decoration: none; }
+        .btn-new-yape i { margin-right: 8px; font-size: 18px; }
+        .help-link { display: flex; justify-content: center; align-items: center; color: white; font-weight: 600; font-size: 16px; text-decoration: none; cursor: pointer; }
+        .help-link i { margin-right: 6px; font-size: 20px; }
+
+        /* --- NUEVO CONTENEDOR DE PUBLICIDAD --- */
+        .bottom-section { margin-top: 15px; display: flex; justify-content: center; width: 100%; padding-bottom: 20px; }
+        .banner-container { width: 100%; max-width: none; border-radius: 16px; overflow: hidden; background-color: #5B1B6C; padding: 15px; box-shadow: none; isolation: isolate; }
+        .banner-header { display: flex; align-items: center; margin-bottom: 10px; }
+        .banner-title { color: white; font-weight: 700; font-size: 16px; margin-right: 8px; }
+        .banner-badge { background-color: #FFC107; color: #000; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        .banner-container img { width: 100%; height: auto; display: block; border-radius: 10px; }
+        
+        #burst-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; display: flex; justify-content: center; align-items: flex-start; }
+        #burst-image { width: 100%; height: 100%; object-fit: cover; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <img src="img/animationyape.gif" alt="Yape" class="logo-header-img" id="logoGif">
+            <img src="img/LogoYape.svg" alt="Yape" class="logo-header-img" id="logoStatic" style="display: none;">
+            
+            <a href="inicio.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+
+        <div id="burst-container">
+            <img id="burst-image" src="img/download.png" alt="Confeti" style="display: none; position: absolute; top: 0; left: 0; width: 100%; pointer-events: none;">
+        </div>
+
+        <div class="success-card">
+            
+            <div class="card-header">
+                <div class="yapeaste-title">¡Yapeaste!</div>
+                <button class="share-btn" onclick="compartirVoucher()">
+                    <img src="img/compartiricon.png" alt="Share" class="icon-share"> 
+                    Compartir
+                </button>
+            </div>
+
+            <div class="amount-section">
+                <span class="currency">S/</span>
+                <span class="amount-value" id="finalAmount">0</span>
+            </div>
+
+            <div class="recipient-name" id="finalName">Nombre Destino</div>
+            
+            <div class="date-time">
+                <img src="img/fecha-icon.svg" alt="Fecha" class="icon-datetime">
+                <span id="dateText">-- ---. ----</span>
+                
+                <span class="separator">|</span>
+                
+                <img src="img/hora-icon.svg" alt="Hora" class="icon-datetime">
+                <span id="timeText">--:--</span>
+            </div>
+
+            <div class="message-bubble" id="msgBubble">
+                <img src="img/mensaje-icon1.png" alt="Mensaje" class="msg-icon-img">
+                <span class="msg-text" id="msgContent"></span>
+            </div>
+
+            <div class="full-divider" id="divider1"></div>
+
+            <div class="code-row" id="codeRow">
+                <div class="code-title">
+                    CÓDIGO DE SEGURIDAD 
+                    <img src="img/codigo-seguridad-icon.svg" alt="Info" class="icon-info">
+                </div>
+                <div class="code-boxes" id="securityCodeContainer">
+                    <div class="code-box">0</div><div class="code-box">0</div><div class="code-box">0</div>
+                </div>
+            </div>
+
+            <div class="full-divider" id="divider2"></div>
+
+            <div class="code-title-section">DATOS DE LA TRANSACCIÓN</div>
+            <div class="details-grid">
+                <span class="label" id="labelCelular">Nro. de celular</span>
+                <span class="value" id="finalNumber">*** *** 999</span>
+                
+                <span class="label" id="labelDestino">Destino</span>
+                <span class="value" id="finalDestino">Yape</span>
+                
+                <span class="label">Nro. de operación</span>
+                <span class="value" id="opNumber">0000000</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="inicio.html" class="btn-new-yape">
+                <i class="fa-regular fa-paper-plane"></i> Nuevo Yapeo
+            </a>
+            <div class="help-link">
+                <i class="fa-solid fa-headset"></i> Necesito ayuda
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="banner-container">
+                <div class="banner-header">
+                    <span class="banner-title">Más en Yape</span>
+                    <span class="banner-badge">Nuevo</span>
+                </div>
+                <img id="randomAdImage" src="" alt="Promo">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. ANIMACIÓN DEL CONFETI (Con Pre-cargador Anti-Lag) ---
+        window.addEventListener('load', () => {
+            const imgElement = document.getElementById('burst-image');
+            const frameNames = [
+                'download.png', 'download1.png', 'download2.png', 'download3.png', 'download4.png',
+                'download5.png', 'download6.png', 'download7.png', 'download8.png', 'download9.png',
+                'download10.png', 'download11.png', 'download13.png', 'download14.png' 
+            ];
+            
+            let imagenesCargadas = 0;
+            const imagenesEnMemoria = [];
+
+            frameNames.forEach((name, index) => {
+                const img = new Image();
+                img.onload = () => {
+                    imagenesCargadas++;
+                    if (imagenesCargadas === frameNames.length) {
+                        playSequence();
+                    }
+                };
+                img.onerror = () => {
+                    imagenesCargadas++;
+                    if (imagenesCargadas === frameNames.length) playSequence();
+                };
+                img.src = 'img/' + name;
+                imagenesEnMemoria[index] = img;
+            });
+
+            function playSequence() {
+                imgElement.style.display = 'block';
+                let currentFrame = 0;
+                const interval = setInterval(() => {
+                    if (currentFrame >= frameNames.length) { 
+                        clearInterval(interval); 
+                        imgElement.style.display = 'none'; 
+                        return; 
+                    }
+                    imgElement.src = imagenesEnMemoria[currentFrame].src;
+                    currentFrame++;
+                }, 80);
+            }
+        });
+
+        // --- 2. LÓGICA DE DATOS ---
+        const params = new URLSearchParams(window.location.search);
+        
+        const monto = params.get('monto') || "0";
+        const montoFormateado = parseFloat(monto) % 1 === 0 ? parseInt(monto) : parseFloat(monto).toFixed(2);
+        
+        const nombreRaw = decodeURIComponent(params.get('nombre') || "Maikol Esleiter");
+        let numero = params.get('numero') || "999999999";
+        const mensaje = decodeURIComponent(params.get('mensaje') || "");
+        const destinoParam = decodeURIComponent(params.get('destino') || "Yape");
+        const operacionParam = params.get('operacion');
+        
+        // RECIBIR PARÁMETRO DE CENSURA
+        const censurarParam = params.get('censurar'); // "true" o "false"
+
+        // --- LÓGICA DE NOMBRE ---
+        let nombreMostrado = nombreRaw;
+        
+        if (censurarParam !== 'false') {
+            const partesNombre = nombreRaw.split(" ");
+            if (partesNombre.length > 1) {
+                const primerNombre = partesNombre[0];
+                const segundoNombre = partesNombre[1];
+                nombreMostrado = `${primerNombre} ${segundoNombre.substring(0, 3)}*`;
+            }
+        }
+        
+        document.getElementById('finalAmount').textContent = montoFormateado;
+        document.getElementById('finalName').textContent = nombreMostrado;
+        document.getElementById('finalDestino').textContent = destinoParam;
+
+        const lastThree = numero.slice(-3);
+        document.getElementById('finalNumber').textContent = `*** *** ${lastThree}`;
+
+        // FECHA Y HORA
+        const fechaParam = params.get('fecha');
+        const horaParam = params.get('hora');
+        let dateStr, timeStr;
+
+        if (fechaParam && horaParam) {
+            const [y, m, d] = fechaParam.split('-');
+            const dateObj = new Date(y, m - 1, d); 
+            const optionsDate = { day: 'numeric', month: 'short', year: 'numeric' };
+            dateStr = dateObj.toLocaleDateString('es-ES', optionsDate);
+
+            const [h, min] = horaParam.split(':');
+            let hour = parseInt(h);
+            const ampm = hour >= 12 ? 'p. m.' : 'a. m.';
+            hour = hour % 12;
+            hour = hour ? hour : 12;
+            timeStr = `${hour.toString().padStart(2, '0')}:${min} ${ampm}`;
+        } else {
+            const now = new Date();
+            const optionsDate = { day: 'numeric', month: 'short', year: 'numeric' };
+            const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+            dateStr = now.toLocaleDateString('es-ES', optionsDate);
+            timeStr = now.toLocaleTimeString('en-US', optionsTime).toLowerCase().replace('pm', 'p. m.').replace('am', 'a. m.');
+        }
+        
+        if (!dateStr.endsWith('.')) {
+            const parts = dateStr.split(' ');
+            if(parts.length >= 2 && !parts[1].includes('.')) {
+                 parts[1] += '.';
+                 dateStr = parts.join(' ');
+            }
+        }
+
+        document.getElementById('dateText').textContent = dateStr;
+        document.getElementById('timeText').textContent = timeStr;
+
+        // MENSAJE
+        const msgBubble = document.getElementById('msgBubble');
+        if (mensaje && mensaje.trim() !== "" && mensaje !== "undefined" && mensaje !== "null") {
+            document.getElementById('msgContent').textContent = mensaje;
+            msgBubble.style.display = "flex";
+        } else {
+            msgBubble.style.display = "none";
+        }
+
+        // OPERACIÓN
+        let finalOpNum = operacionParam || Math.floor(1000000 + Math.random() * 90000000).toString();
+        if (destinoParam === 'IziPay') {
+            finalOpNum = '0000000000000' + finalOpNum;
+        }
+        document.getElementById('opNumber').textContent = finalOpNum;
+
+        // CÓDIGO SEGURIDAD 
+        const secContainer = document.getElementById('securityCodeContainer');
+        secContainer.innerHTML = '';
+        const last3Digits = finalOpNum.slice(-3).split('');
+        last3Digits.forEach(digit => {
+            const div = document.createElement('div');
+            div.className = 'code-box';
+            div.textContent = digit;
+            secContainer.appendChild(div);
+        });
+
+        // VISUALIZACIÓN SEGÚN DESTINO
+        const codeRow = document.getElementById('codeRow');
+        const divider1 = document.getElementById('divider1'); 
+        const divider2 = document.getElementById('divider2'); 
+        const labelCelular = document.getElementById('labelCelular');
+        const finalNumber = document.getElementById('finalNumber');
+        const labelDestino = document.getElementById('labelDestino');
+        const finalDestino = document.getElementById('finalDestino');
+
+        if (destinoParam === 'Plin' || destinoParam === 'IziPay') {
+            codeRow.style.display = 'none';
+            divider1.style.display = 'none'; 
+            labelCelular.style.display = 'none';
+            finalNumber.style.display = 'none';
+        }
+
+        if (destinoParam === 'IziPay') {
+            labelDestino.style.display = 'none';
+            finalDestino.style.display = 'none';
+        }
+
+        // --- NUEVA LISTA DE ANUNCIOS ---
+        const ads = [
+            'u3d0lfltdyebjxhsma8s.webp', 'ugv4arfcb4mmsk8t600y.webp', 'xyj9w83jmmimoiqipld7.webp',
+            'lntvtu6siosxnkxwyazk.webp', 'dfxexhqz0ljgixgrc71s.webp', 'hgdybgbebofngmi3q8dr.webp',
+            'cnjvw02u0kiizr7cmdze.webp', 'z9xriezpfzkwylyqfpdt.webp', 'zhx1nztq3y8bocojgtol.webp',
+            'hbi3k6wkz09e5sggstxp.webp', 'oy0kuhvapnkwtazyyozh.webp', 'nrewunfzaog5j43g4ned.webp',
+            'n2htnzpfyn7wlwixuchk.webp', 'ygfgjoyhfhxkdbqtrsvk.jpg'
+        ];
+        const randomAdIndex = Math.floor(Math.random() * ads.length);
+        document.getElementById('randomAdImage').src = 'img/' + ads[randomAdIndex];
+
+        // --- 3. LÓGICA DE COMPARTIR VOUCHER ---
+        function prepararParaFoto(esParaFoto) {
+            const shareBtn = document.querySelector('.share-btn');
+            const closeBtn = document.querySelector('.close-btn');
+            const actionButtons = document.querySelector('.action-buttons');
+            const bottomSection = document.querySelector('.bottom-section');
+            
+            // TRUCO DEL LOGO: Obtenemos los dos elementos
+            const logoGif = document.getElementById('logoGif');
+            const logoStatic = document.getElementById('logoStatic');
+            
+            if (esParaFoto) {
+                if(shareBtn) shareBtn.style.visibility = 'hidden';
+                if(closeBtn) closeBtn.style.visibility = 'hidden';
+                if(actionButtons) actionButtons.style.display = 'none';
+                if(bottomSection) bottomSection.style.display = 'none';
+                
+                // Cambiamos el GIF por la imagen estática
+                if(logoGif) logoGif.style.display = 'none';
+                if(logoStatic) logoStatic.style.display = 'block';
+            } else {
+                if(shareBtn) shareBtn.style.visibility = 'visible';
+                if(closeBtn) closeBtn.style.visibility = 'visible';
+                if(actionButtons) actionButtons.style.display = 'flex';
+                if(bottomSection) bottomSection.style.display = 'flex';
+                
+                // Devolvemos el GIF y ocultamos la estática
+                if(logoGif) logoGif.style.display = 'block';
+                if(logoStatic) logoStatic.style.display = 'none';
+            }
+        }
+
+        function compartirVoucher() {
+            prepararParaFoto(true);
+
+            setTimeout(() => {
+                html2canvas(document.body, { 
+                    backgroundColor: '#742284', 
+                    scale: 2 
+                }).then(canvas => {
+                    canvas.toBlob(blob => {
+                        let nombreParaArchivo = document.getElementById('finalName').textContent.replace(/[^a-zA-Z0-9]/g, "_");
+                        const file = new File([blob], `Yape_Editable_${nombreParaArchivo}.png`, { type: 'image/png' });
+                        
+                        if (navigator.share) {
+                            navigator.share({
+                                title: `Yapeo a ${nombreParaArchivo}`,
+                                files: [file]
+                            }).then(() => {
+                                prepararParaFoto(false);
+                            }).catch(err => {
+                                console.log('Error al compartir:', err);
+                                prepararParaFoto(false);
+                            });
+                        } else {
+                            const link = document.createElement('a');
+                            link.download = `Yape_Editable_${nombreParaArchivo}.png`;
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                            prepararParaFoto(false);
+                        }
+                    });
+                });
+            }, 150); 
+        }
+
+    </script>
+</body>
+</html>

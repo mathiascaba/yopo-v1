@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script type="module" src="seguridad.js"></script>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar servicios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Colores Oficiales Yape */
+            --bg-color: #f4f5f7;
+            --card-color: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --accent-purple: #742284;
+            --accent-teal: #00BFA5;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg-color);
+        }
+
+        /* --- Header Estilo Yape --- */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--accent-purple); /* Morado Yape */
+            color: white;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 5px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            flex: 1;
+            text-align: left;
+        }
+
+        .close-btn {
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        /* --- Formulario --- */
+        .form-content {
+            padding: 25px 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-purple); /* Textos morados */
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Input con diseño Yape (Blanco y limpio) */
+        .input-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+
+        .input-card:focus-within {
+            border-color: var(--accent-teal);
+            box-shadow: 0 2px 8px rgba(0, 191, 165, 0.2);
+        }
+
+        .input-icon {
+            color: var(--accent-purple);
+            font-size: 20px;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .input-field::placeholder {
+            color: #999;
+            font-weight: 400;
+        }
+
+        /* --- Footer Botón --- */
+        .footer {
+            padding: 20px;
+            padding-bottom: 40px; 
+            background-color: var(--bg-color);
+        }
+
+        .btn-yapear {
+            width: 100%;
+            padding: 18px;
+            border-radius: 30px; /* Bordes muy redondeados tipo Yape */
+            border: none;
+            background-color: var(--accent-teal); /* Cyan Yape */
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 191, 165, 0.3);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .btn-yapear:active {
+            transform: scale(0.97);
+            background-color: #00a892;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="inicio.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="page-title">Pagar Servicios</div>
+            <a href="inicio.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+
+        <div class="form-content">
+            
+            <div class="form-group">
+                <label class="label">Empresa</label>
+                <div class="input-card">
+                    <i class="fa-solid fa-building input-icon"></i>
+                    <input type="text" id="empresa" class="input-field" placeholder="Ej. PagoEfectivo" value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Monto a Pagar</label>
+                <div class="input-card">
+                    <i class="fa-solid fa-sack-dollar input-icon"></i>
+                    <input type="number" id="monto" class="input-field" placeholder="0.00" value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Nombre del Servicio</label>
+                <div class="input-card">
+                    <i class="fa-solid fa-bolt input-icon"></i>
+                    <input type="text" id="servicio" class="input-field" placeholder="Ej. Luz del Sur" value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Código de Cliente</label>
+                <div class="input-card">
+                    <i class="fa-solid fa-barcode input-icon"></i>
+                    <input type="number" id="codigo" class="input-field" placeholder="Ej. 12345678" value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Titular</label>
+                <div class="input-card">
+                    <i class="fa-solid fa-user input-icon"></i>
+                    <input type="text" id="titular" class="input-field" placeholder="Nombre completo" value="">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <button id="btnYapear" class="btn-yapear">Yapear Servicio</button>
+        </div>
+    </div>
+
+    <script>
+        const btnYapear = document.getElementById('btnYapear');
+        
+        // Redirección con datos (LÓGICA INTACTA)
+        btnYapear.addEventListener('click', () => {
+            const empresa = document.getElementById('empresa').value;
+            const monto = document.getElementById('monto').value;
+            const servicio = document.getElementById('servicio').value;
+            const codigo = document.getElementById('codigo').value;
+            const titular = document.getElementById('titular').value;
+
+            // Enviamos todo a la página de éxito
+            const url = `exito_servicios.html?empresa=${encodeURIComponent(empresa)}&monto=${monto}&servicio=${encodeURIComponent(servicio)}&codigo=${codigo}&titular=${encodeURIComponent(titular)}`;
+            
+            window.location.href = url;
+        });
+    </script>
+</body>
+</html>

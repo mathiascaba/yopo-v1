@@ -1,0 +1,474 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script type="module" src="seguridad.js"></script>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos de Cuenta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-color: #1E1E1E;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent-purple: #7c4dff;
+            --accent-teal: #00BFA5;
+            --danger: #ff5252;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-primary); 
+        }
+
+        .container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            min-height: 100vh; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-top: 10px;
+        }
+
+        .back-icon { 
+            font-size: 20px; 
+            color: var(--text-secondary);
+            padding: 10px;
+            margin-left: -10px;
+            cursor: pointer; 
+            transition: color 0.2s;
+        }
+        .back-icon:active { color: var(--text-primary); }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        /* CARDS GENERAL */
+        .card-panel {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #333;
+        }
+
+        /* INPUT NOMBRE */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .label-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+        .edit-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            font-size: 22px;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .edit-input:focus {
+            border-bottom: 2px solid var(--accent-purple);
+        }
+
+        /* GRID OPTIONS */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .option-card {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            border: 1px solid #333;
+        }
+        .option-card:active { 
+            transform: scale(0.98); 
+            background-color: #252525;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .card-value-input { 
+            font-size: 26px; 
+            font-weight: 700; 
+            color: var(--accent-teal); 
+            background: transparent; 
+            border: none; 
+            width: 100%; 
+            outline: none;
+            margin-top: 10px;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            width: 44px; height: 24px; background: #444; border-radius: 20px; position: relative; transition: background 0.3s;
+        }
+        .toggle-switch.active { background: var(--accent-teal); }
+        
+        .toggle-knob {
+            width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active .toggle-knob { left: 23px; }
+
+        .card-title { 
+            font-weight: 700; 
+            font-size: 13px; 
+            color: var(--text-primary);
+            margin-top: 10px;
+        }
+        .card-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        /* BUTTON */
+        .btn-register {
+            margin-top: auto; 
+            background: linear-gradient(135deg, #7c4dff, #511973);
+            color: white;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
+            transition: transform 0.1s;
+        }
+        .btn-register:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fa-solid fa-arrow-left back-icon" onclick="window.location.href='opciones.html'"></i>
+            <span class="header-title">Configurar Datos</span>
+        </div>
+        
+        <div class="card-panel profile-section">
+            <div class="label-text">Nombre de Usuario</div>
+            <div style="position: relative; display:flex; align-items:center;">
+                <input type="text" id="editName" class="edit-input" value="" autocomplete="off">
+                <i class="fa-solid fa-pen" style="color: #555; font-size: 14px;"></i>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="option-card" style="cursor: default;">
+                <div class="card-header-row">
+                    <div class="icon-box" style="background: rgba(0, 191, 165, 0.1); color: var(--accent-teal);">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <i class="fa-solid fa-pen" style="font-size: 12px; color: #555;"></i>
+                </div>
+                <div>
+                    <div class="label-text" style="margin-top:5px;">Saldo</div>
+                    <input type="number" id="editBalance" class="card-value-input" value="1200">
+                </div>
+            </div>
+
+            <div class="option-card" id="cardPopup">
+                <div class="card-header-row">
+                    <div class="icon-box" style="background: rgba(255, 82, 82, 0.1); color: var(--danger);">
+                        <i class="fa-regular fa-clone"></i>
+                    </div>
+                    <div class="toggle-switch active" id="togglePopup"><div class="toggle-knob"></div></div>
+                </div>
+                <div>
+                    <div class="card-title">POPUP PUBLICIDAD</div>
+                    <div class="card-desc" id="popupStatusText">Visible al inicio</div>
+                </div>
+            </div>
+
+            <div class="option-card" onclick="window.location.href='https://t.me/+6weA5d0fVzFlYTcx'">
+                <div class="card-header-row">
+                    <div class="icon-box" style="background: rgba(0, 136, 204, 0.1); color: #0088cc;">
+                        <i class="fa-brands fa-telegram"></i>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 12px; color: #555;"></i>
+                </div>
+                <div>
+                    <div class="card-title">GRUPO TELEGRAM</div>
+                    <div class="card-desc">Únete al canal</div>
+                </div>
+            </div>
+
+            <div class="option-card" onclick="window.location.href='sobre.html'">
+                <div class="card-header-row">
+                    <div class="icon-box" style="background: #333; color: #ccc;">
+                        <i class="fa-solid fa-info"></i>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: #555;"></i>
+                </div>
+                <div>
+                    <div class="card-title">INFORMACIÓN</div>
+                    <div class="card-desc">Créditos y versión</div>
+                </div>
+            </div>
+
+            <div class="option-card" id="cardBotBtn">
+                <div class="card-header-row">
+                    <div class="icon-box" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="toggle-switch" id="toggleBot"><div class="toggle-knob"></div></div>
+                </div>
+                <div>
+                    <div class="card-title">BÚSQUEDA BOT</div>
+                    <div class="card-desc" id="botStatusText">Desactivado</div>
+                </div>
+            </div>
+
+            <div class="option-card" id="cardCorreoBtn" style="grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: flex-start;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div class="icon-box" style="background: rgba(124, 77, 255, 0.1); color: var(--accent-purple);">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="card-title" style="margin-top: 0;">CONSTANCIAS A CORREO</div>
+                                <div style="background: var(--accent-purple); color: white; font-size: 9px; font-weight: bold; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Nueva Función</div>
+                            </div>
+                            <div class="card-desc" id="correoStatusText" style="margin-top: 2px;">Desactivado</div>
+                        </div>
+                    </div>
+                    <div class="toggle-switch" id="toggleCorreo"><div class="toggle-knob"></div></div>
+                </div>
+                
+                <div id="expandableCorreo" style="display: block; margin-top: 16px; border-top: 1px solid #333; padding-top: 16px;">
+                    <div class="label-text" style="margin-bottom: 8px;">Coloca aquí tu correo electrónico</div>
+                    <input type="email" id="editCorreoInput" class="edit-input" style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);" placeholder="ejemplo@correo.com" autocomplete="off" spellcheck="false">
+                    
+                    <div class="label-text" style="margin-bottom: 8px;">Nro de celular</div>
+                    <input type="tel" id="editPhone" class="edit-input" style="font-size: 16px; margin-bottom: 12px; color: var(--text-primary);" placeholder="999 999 999" autocomplete="off" maxlength="9">
+                    
+                    <p style="font-size: 11px; color: var(--text-secondary); margin: 0; line-height: 1.4;" id="correoHintText">Constancias directamente a tu correo, se desactiva cada 3 yapeos, debes volver a activarlo.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="btn-register" id="btnRegistrar">Guardar Cambios</button>
+    </div>
+
+    <script>
+        // Elementos Originales
+        const nameInput = document.getElementById('editName');
+        const balanceInput = document.getElementById('editBalance');
+        const togglePopup = document.getElementById('togglePopup');
+        const popupStatusText = document.getElementById('popupStatusText');
+        const cardPopup = document.getElementById('cardPopup');
+
+        // Elementos Nuevos (Bot)
+        const cardBotBtn = document.getElementById('cardBotBtn');
+        const toggleBot = document.getElementById('toggleBot');
+        const botStatusText = document.getElementById('botStatusText');
+
+        // Elementos Nuevos (Correo)
+        const cardCorreoBtn = document.getElementById('cardCorreoBtn');
+        const toggleCorreo = document.getElementById('toggleCorreo');
+        const correoStatusText = document.getElementById('correoStatusText');
+        const editCorreoInput = document.getElementById('editCorreoInput');
+        const phoneInput = document.getElementById('editPhone');
+
+        // Estados
+        let isPopupEnabled = true;
+        let isCorreoEnabled = false;
+        let isBotEnabled = false; // Estado inicial del Bot
+
+        // Limpiar input de teléfono para que solo acepte números
+        phoneInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // --- CARGAR DATOS ---
+        window.addEventListener('load', () => {
+            // Nombre y Saldo
+            if(localStorage.getItem('yape_name')) nameInput.value = localStorage.getItem('yape_name');
+            if(localStorage.getItem('yape_balance')) balanceInput.value = localStorage.getItem('yape_balance');
+            
+            // Popup Estado
+            const savedPopup = localStorage.getItem('yape_show_popup');
+            if (savedPopup === 'false') {
+                isPopupEnabled = false;
+                togglePopup.classList.remove('active');
+                popupStatusText.textContent = "Desactivado";
+                popupStatusText.style.color = "#666";
+            } else {
+                isPopupEnabled = true;
+                togglePopup.classList.add('active');
+                popupStatusText.textContent = "Activado";
+                popupStatusText.style.color = "#00BFA5";
+            }
+
+            // Bot Telegram Estado
+            if (localStorage.getItem('yape_bot_telegram_activo') === 'true') {
+                isBotEnabled = true;
+                toggleBot.classList.add('active');
+                botStatusText.textContent = "Activado";
+                botStatusText.style.color = "#00BFA5";
+            }
+
+            // Correo y Celular Estado
+            if (localStorage.getItem('yape_correo')) {
+                editCorreoInput.value = localStorage.getItem('yape_correo');
+            }
+            if (localStorage.getItem('yape_user_phone')) {
+                phoneInput.value = localStorage.getItem('yape_user_phone');
+            }
+
+            if (localStorage.getItem('yape_envio_correo_activo') === 'true') {
+                isCorreoEnabled = true;
+                toggleCorreo.classList.add('active');
+                correoStatusText.textContent = "Activado";
+                correoStatusText.style.color = "#00BFA5";
+            }
+        });
+
+        // --- LÓGICA TOGGLE POPUP ---
+        cardPopup.addEventListener('click', (e) => {
+            isPopupEnabled = !isPopupEnabled;
+            
+            if(isPopupEnabled) {
+                togglePopup.classList.add('active');
+                popupStatusText.textContent = "Activado";
+                popupStatusText.style.color = "#00BFA5";
+            } else {
+                togglePopup.classList.remove('active');
+                popupStatusText.textContent = "Desactivado";
+                popupStatusText.style.color = "#666";
+            }
+        });
+
+        // --- LÓGICA TOGGLE BOT ---
+        cardBotBtn.addEventListener('click', (e) => {
+            isBotEnabled = !isBotEnabled;
+            
+            if(isBotEnabled) {
+                toggleBot.classList.add('active');
+                botStatusText.textContent = "Activado";
+                botStatusText.style.color = "#00BFA5";
+            } else {
+                toggleBot.classList.remove('active');
+                botStatusText.textContent = "Desactivado";
+                botStatusText.style.color = "#666";
+            }
+        });
+
+        // --- LÓGICA TOGGLE CORREO ---
+        cardCorreoBtn.addEventListener('click', (e) => {
+            // Evitamos que al tocar los inputs o textos se accione el interruptor por error
+            if(e.target.tagName === 'INPUT' || e.target.id === 'correoHintText' || e.target.id === 'expandableCorreo') return;
+
+            // Validación antes de activar
+            if (!isCorreoEnabled) {
+                const phoneVal = phoneInput.value.trim();
+                const emailVal = editCorreoInput.value.trim();
+                let canActivate = true;
+
+                if (phoneVal.length !== 9) {
+                    phoneInput.style.borderBottom = "2px solid var(--danger)";
+                    setTimeout(() => phoneInput.style.borderBottom = "2px solid transparent", 1500);
+                    canActivate = false;
+                }
+                if (!emailVal || !emailVal.includes('@')) {
+                    editCorreoInput.style.borderBottom = "2px solid var(--danger)";
+                    setTimeout(() => editCorreoInput.style.borderBottom = "2px solid transparent", 1500);
+                    canActivate = false;
+                }
+
+                if(!canActivate) return; // Detenemos la activación si faltan datos
+            }
+
+            isCorreoEnabled = !isCorreoEnabled;
+            
+            if(isCorreoEnabled) {
+                toggleCorreo.classList.add('active');
+                correoStatusText.textContent = "Activado";
+                correoStatusText.style.color = "#00BFA5";
+            } else {
+                toggleCorreo.classList.remove('active');
+                correoStatusText.textContent = "Desactivado";
+                correoStatusText.style.color = "#666";
+            }
+        });
+
+        // --- GUARDAR Y SALIR ---
+        document.getElementById('btnRegistrar').addEventListener('click', () => {
+            localStorage.setItem('yape_name', nameInput.value);
+            localStorage.setItem('yape_balance', balanceInput.value);
+            
+            // Guardar configuración del popup y BOT
+            localStorage.setItem('yape_show_popup', isPopupEnabled);
+            localStorage.setItem('yape_bot_telegram_activo', isBotEnabled);
+
+            // Guardar configuración del correo y celular
+            localStorage.setItem('yape_correo', editCorreoInput.value);
+            localStorage.setItem('yape_user_phone', phoneInput.value);
+            localStorage.setItem('yape_envio_correo_activo', isCorreoEnabled);
+            
+            // Si el usuario lo activó, reiniciamos el contador a 0 para que empiece de nuevo los 3 intentos
+            if(isCorreoEnabled) {
+                localStorage.setItem('yape_correo_contador', '0');
+            }
+
+            window.location.href = 'inicio.html';
+        });
+    </script>
+</body>
+</html>

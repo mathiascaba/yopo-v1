@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script type="module" src="seguridad.js"></script>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escanear QR</title>
+    <link rel="icon" href="img/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: black;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #camera-stream {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0;
+        }
+
+        .container {
+            max-width: 480px; margin: 0 auto; width: 100%; height: 100%;
+            display: flex; flex-direction: column; position: relative; z-index: 1;
+        }
+
+        .close-btn {
+            position: absolute; top: 40px; right: 20px; color: white;
+            font-size: 28px; text-decoration: none; z-index: 10;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer;
+        }
+
+        .center-content {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+
+        .scan-text {
+            font-size: 16px; margin-bottom: 20px; font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* --- NUEVO: CUADRADO DEL ESCÁNER VISUAL --- */
+        .scan-box {
+            width: 250px;
+            height: 250px;
+            border: 2px solid rgba(255, 255, 255, 0.3); /* Cuadrado base semitransparente */
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        /* Esquinas remarcadas estilo Yape */
+        .scan-box::before, .scan-box::after {
+            content: '';
+            position: absolute;
+            width: 40px; height: 40px;
+            border-color: #00BFA5;
+            border-style: solid;
+        }
+
+        .scan-box::before {
+            top: -2px; left: -2px;
+            border-width: 4px 0 0 4px;
+            border-top-left-radius: 16px;
+        }
+
+        .scan-box::after {
+            bottom: -2px; right: -2px;
+            border-width: 0 4px 4px 0;
+            border-bottom-right-radius: 16px;
+        }
+        /* ------------------------------------------- */
+
+        .joke-btn {
+            background-color: #4D4D4D; border: none; color: white;
+            padding: 10px 20px; border-radius: 20px; font-size: 14px;
+            font-weight: 500; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .bottom-sheet {
+            background-color: white;
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            padding: 25px 20px;
+            padding-bottom: max(60px, env(safe-area-inset-bottom));
+            color: #333;
+        }
+
+        .upload-btn {
+            display: flex; align-items: center; justify-content: flex-start;
+            border: 1px solid #eee; border-radius: 8px; padding: 15px;
+            font-weight: 600; color: #333; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .upload-icon {
+            width: 24px; height: 24px; margin-right: 15px; object-fit: contain;
+        }
+
+        #fileInput { display: none; }
+
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
+            background-color: rgba(0,0,0,0.6); z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .loader-overlay.show { opacity: 1; pointer-events: all; }
+
+        .loader-card {
+            background: white; width: 220px; height: 100px;
+            border-radius: 12px; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            flex-direction: column;
+        }
+        .custom-spinner {
+            width: 40px; height: 40px; border: 4px solid #e0e0e0;
+            border-top: 4px solid #00BFA5; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 10px;
+        }
+        .loader-msg { font-size: 14px; font-weight: 600; color: #333; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <video id="camera-stream" autoplay playsinline muted></video>
+
+    <div class="loader-overlay" id="mainLoader">
+        <div class="loader-card">
+            <div class="custom-spinner"></div>
+            <div class="loader-msg" id="loaderText">Cargando...</div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*">
+
+    <div class="container">
+        <a href="#" id="btnClose" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+
+        <div class="center-content">
+            <div class="scan-text">Escanea un QR con tu cámara</div>
+            
+            <div class="scan-box"></div>
+
+            <button class="joke-btn">Encender Linterna</button>
+        </div>
+
+        <div class="bottom-sheet">
+            <div class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                <img src="img/subir-imagen-icon.svg" class="upload-icon" alt="">
+                Subir una imagen
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, doc, getDoc } from './firebase.js';
+
+        const fileInput = document.getElementById('fileInput');
+        const loader = document.getElementById('mainLoader');
+        const loaderText = document.getElementById('loaderText');
+
+        // 1. CERRAR PÁGINA
+        document.getElementById('btnClose').addEventListener('click', (e) => {
+            e.preventDefault();
+            loaderText.textContent = "";
+            loader.classList.add('show');
+            setTimeout(() => { window.location.href = 'inicio.html'; }, 800);
+        });
+
+        // --- PREPARAMOS EL FOTÓGRAFO INVISIBLE ---
+        const canvasElement = document.createElement('canvas');
+        const canvas = canvasElement.getContext('2d');
+        let escaneando = true; // Para detener la cámara cuando encuentre un QR
+
+        // 2. INICIAR CÁMARA Y ESCÁNER EN VIVO
+        const video = document.getElementById('camera-stream');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(stream => { 
+                video.srcObject = stream;
+                // playsinline es vital para que no se abra a pantalla completa en iPhone
+                video.setAttribute("playsinline", true); 
+                video.play();
+                
+                // Le decimos al fotógrafo que empiece a trabajar
+                requestAnimationFrame(escanearVideo); 
+            })
+            .catch(console.error);
+        }
+
+        // BUCLE PRINCIPAL (Se repite unas 30 veces por segundo)
+        function escanearVideo() {
+            if (!escaneando) return; // Si ya atrapamos uno, dejamos de tomar fotos
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                // Ajustamos el tamaño del lienzo al del video
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                
+                // 1. Tomamos la foto
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                // 2. Extraemos los píxeles
+                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                
+                // 3. Se los pasamos a jsQR
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    escaneando = false; // ¡Bingo! Detenemos el motor
+                    video.pause(); // Congelamos la cámara para dar un buen efecto visual
+                    console.log("QR Detectado en vivo:", code.data);
+                    buscarEnFirebase(code.data);
+                }
+            }
+            
+            // Si seguimos escaneando y no ha encontrado nada, vuelve a intentarlo de inmediato
+            if (escaneando) {
+                requestAnimationFrame(escanearVideo);
+            }
+        }
+
+        // 3. LÓGICA DE SUBIR IMAGEN (Galería)
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            escaneando = false; // Detenemos la cámara en vivo por si acaso
+            loaderText.textContent = "Analizando QR...";
+            loader.classList.add('show');
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvasGaleria = document.createElement('canvas');
+                    const contextGaleria = canvasGaleria.getContext('2d');
+                    canvasGaleria.width = img.width;
+                    canvasGaleria.height = img.height;
+                    contextGaleria.drawImage(img, 0, 0, img.width, img.height);
+                    
+                    const imageData = contextGaleria.getImageData(0, 0, canvasGaleria.width, canvasGaleria.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        console.log("QR Detectado en galería:", code.data);
+                        buscarEnFirebase(code.data);
+                    } else {
+                        alert("No se encontró ningún QR válido en la imagen.");
+                        loader.classList.remove('show');
+                        escaneando = true; // Volvemos a encender el escáner en vivo si falló
+                        requestAnimationFrame(escanearVideo);
+                    }
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 4. BUSCAR EN FIREBASE Y REDIRIGIR
+        async function buscarEnFirebase(qrCodeData) {
+            loaderText.textContent = "Buscando datos...";
+            loader.classList.add('show');
+            
+            try {
+                // Limpieza básica por si las dudas
+                const qrId = qrCodeData.replace(/[^a-zA-Z0-9]/g, ""); 
+                
+                // Simulación de éxito
+                setTimeout(() => {
+                    window.location.href = `monto.html?qr_data=${encodeURIComponent(qrCodeData)}`;
+                }, 1000);
+
+            } catch (error) {
+                console.error(error);
+                alert("Error al procesar el QR.");
+                loader.classList.remove('show');
+                escaneando = true; // Reiniciamos si hubo un error
+                requestAnimationFrame(escanearVideo);
+            }
+        }
+    </script>
+</body>
+</html>

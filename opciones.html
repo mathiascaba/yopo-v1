@@ -1,0 +1,457 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script type="module" src="seguridad.js"></script>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: white; }
+        .container { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+        
+        .top-image {
+            width: 100%; height: 220px; background-color: #222;
+            background-image: url('img/header_opciones.png');
+            background-size: cover; background-position: center; position: relative;
+        }
+        
+        .back-arrow { position: absolute; top: 20px; left: 20px; color: white; font-size: 24px; cursor: pointer; }
+
+        .menu-container { padding: 20px; margin-top: -20px; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; position: relative; }
+
+        .btn-option {
+            background: linear-gradient(90deg, #6200ea 0%, #7c4dff 100%);
+            color: white; padding: 18px; border-radius: 30px; margin-bottom: 15px;
+            display: flex; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(100, 0, 230, 0.3);
+            text-decoration: none; transition: transform 0.1s;
+            position: relative; /* Para el badge 'Nuevo' */
+        }
+        .btn-option:active { transform: scale(0.98); }
+
+        .btn-icon { font-size: 24px; width: 40px; text-align: center; margin-right: 10px; }
+        .btn-text { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Badge Nuevo */
+        .badge-new {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #FFC107;
+            color: #333;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .other-options-title { font-size: 16px; color: #666; margin: 20px 0 10px 10px; }
+        
+        .btn-cyan {
+            background: #00bcd4; color: white; padding: 18px; border-radius: 30px; margin-bottom: 15px;
+            display: flex; align-items: center; font-weight: 700; font-size: 14px;
+            text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-cyan:active { transform: scale(0.98); }
+
+        /* =========================================
+           ESTILOS DEL MODAL (PANELES)
+           ========================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 5000;
+            display: none; justify-content: center; align-items: flex-end;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-panel {
+            background-color: white;
+            width: 100%; max-width: 480px;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            padding: 25px 20px; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            max-height: 85vh; /* Que no ocupe toda la pantalla si hay muchos contactos */
+        }
+        
+        .modal-overlay.show .modal-panel { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;}
+        .modal-title { font-size: 18px; font-weight: 700; color: #333; }
+        .close-modal-btn { background: none; border: none; font-size: 24px; color: #666; cursor: pointer; }
+
+        /* Estilo del Switch (Interruptor) Nativo iOS/Android style */
+        .switch-container {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: #f5f5f5; padding: 15px; border-radius: 12px; margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .switch-label { font-size: 15px; font-weight: 600; color: #444; }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00BFA5; } /* Verde Yape */
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Formulario para agregar */
+        .add-contact-form { display: flex; gap: 10px; margin-bottom: 20px; }
+        .input-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .contact-input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background-color: #fafafa; }
+        .contact-input:focus { border-color: #7c4dff; background-color: white; }
+        
+        .btn-add { background-color: #7c4dff; color: white; border: none; border-radius: 8px; padding: 0 20px; font-weight: 700; cursor: pointer; transition: 0.1s; }
+        .btn-add:active { transform: scale(0.95); }
+
+        /* Lista de contactos creados */
+        .custom-contact-list { overflow-y: auto; flex: 1; padding-right: 5px; }
+        .empty-msg { text-align: center; color: #999; font-size: 14px; margin-top: 20px; }
+        
+        .custom-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .ci-info { display: flex; flex-direction: column; }
+        .ci-name { font-weight: 600; color: #333; font-size: 15px; margin-bottom: 3px; }
+        .ci-number { color: #888; font-size: 13px; }
+        .btn-delete { background: none; border: none; color: #FF5252; font-size: 18px; cursor: pointer; padding: 5px; }
+
+        /* Toast de notificación dentro del modal */
+        #modalToast {
+            background-color: #333; color: white; text-align: center; border-radius: 30px;
+            padding: 10px 20px; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10;
+        }
+
+        /* Contenedor placeholder para el área grande de Configuración */
+        .future-space {
+            flex: 1;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #aaa;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            margin-top: 5px;
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-image">
+            <i class="fa-solid fa-chevron-left back-arrow" onclick="window.location.href='inicio.html'"></i>
+        </div>
+        <div class="menu-container">
+            
+            <a href="editar_datos.html" class="btn-option">
+                <div class="btn-icon"><i class="fa-regular fa-user"></i></div>
+                <div class="btn-text">Datos de mi cuenta</div>
+            </a>
+
+            <a href="AgregarCm.html" class="btn-option">
+                <div class="btn-icon"><i class="fa-solid fa-phone"></i></div>
+                <div class="btn-text">Agregar contacto</div>
+            </a>
+
+            <a href="AgregarQR.html" class="btn-option">
+                <div class="btn-icon"><i class="fa-solid fa-qrcode"></i></div>
+                <div class="btn-text">Agregar QR</div>
+            </a>
+
+            <a href="editable.html" class="btn-option">
+                <div class="btn-icon"><i class="fa-solid fa-receipt"></i></div>
+                <div class="btn-text">Editar Voucher</div>
+            </a>
+
+            <div class="btn-option">
+                <div class="btn-icon"><i class="fa-solid fa-phone-volume"></i></div>
+                <div class="btn-text">Programar notificación n/a</div>
+            </div>
+
+            <div class="btn-option" onclick="abrirModalContactos()">
+                <div class="btn-icon"><i class="fa-solid fa-address-book"></i></div>
+                <div class="btn-text">Lista de Contactos</div>
+            </div>
+
+            <div class="btn-option" onclick="abrirModalConfig()">
+                <div class="btn-icon"><i class="fa-solid fa-gear"></i></div>
+                <div class="btn-text">Configuración Avanzada</div>
+            </div>
+
+            <div class="other-options-title">Otras opciones</div>
+
+            <div class="btn-cyan" onclick="forzarActualizacion()">
+                <div class="btn-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div>Actualizar App</div>
+            </div>
+
+            <a href="https://t.me/MaikolEsleiter" target="_blank" class="btn-cyan">
+                <div class="btn-icon"><i class="fa-solid fa-headset"></i></div>
+                <div>Contactar soporte</div>
+            </a>
+            
+            <div class="btn-cyan" onclick="window.location.href='sobre.html'">
+                <div class="btn-icon"><i class="fa-solid fa-circle-info"></i></div>
+                <div>Sobre esto</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="contactsModalOverlay">
+            <div class="modal-panel" onclick="event.stopPropagation()">
+                
+                <div class="modal-header">
+                    <div class="modal-title">Contactos Personalizados</div>
+                    <button class="close-modal-btn" onclick="cerrarModalContactos()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="switch-container">
+                    <span class="switch-label">Activar Lista Propia</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleContactsSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="add-contact-form">
+                    <div class="input-group">
+                        <input type="text" id="inputNewName" class="contact-input" placeholder="Nombre completo" autocomplete="off">
+                        <input type="tel" id="inputNewNumber" class="contact-input" placeholder="Celular (9 dígitos)" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '');" autocomplete="off">
+                    </div>
+                    <button class="btn-add" id="btnAddContact" onclick="agregarContacto()">Añadir</button>
+                </div>
+
+                <div class="custom-contact-list" id="customContactList"></div>
+
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="configModalOverlay">
+            <div class="modal-panel" onclick="event.stopPropagation()" style="height: 75vh;">
+                
+                <div class="modal-header">
+                    <div class="modal-title">Configuración Avanzada</div>
+                    <button class="close-modal-btn" onclick="cerrarModalConfig()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="switch-container">
+                    <span class="switch-label">Censurar Nombres (*)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleCensuraSwitch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="future-space">
+                    _print_Hola<br>xd.
+                </div>
+
+            </div>
+        </div>
+
+        <div id="modalToast">Guardado</div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHDXn-R6jgd4fBkgW4KzFp6p6Ym_yqQoI",
+            authDomain: "yapedata.firebaseapp.com",
+            projectId: "yapedata",
+            storageBucket: "yapedata.firebasestorage.app",
+            messagingSenderId: "228862586517",
+            appId: "1:228862586517:web:4e2b2578fe0f826e32b59c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.forzarActualizacion = function() {
+            event.currentTarget.querySelector('div:nth-child(2)').innerText = "Actualizando...";
+            if ('caches' in window) {
+                caches.keys().then((names) => { names.forEach(name => { caches.delete(name); }); });
+            }
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) { registration.unregister(); }
+                });
+            }
+            setTimeout(() => { window.location.reload(true); }, 500);
+        }
+
+        const toast = document.getElementById('modalToast');
+        window.showToast = function(msj) {
+            toast.innerText = msj;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        }
+
+        // =========================================
+        // LÓGICA DE LA AGENDA PERSONALIZADA
+        // =========================================
+        const overlay = document.getElementById('contactsModalOverlay');
+        const switchToggle = document.getElementById('toggleContactsSwitch');
+        const listContainer = document.getElementById('customContactList');
+        const btnAdd = document.getElementById('btnAddContact');
+
+        window.abrirModalContactos = function() {
+            overlay.classList.add('show');
+            cargarDatosGuardados(); 
+        }
+
+        window.cerrarModalContactos = function() {
+            overlay.classList.remove('show');
+            document.getElementById('inputNewName').value = '';
+            document.getElementById('inputNewNumber').value = '';
+        }
+
+        overlay.addEventListener('click', window.cerrarModalContactos);
+
+        window.cargarDatosGuardados = function() {
+            const useCustom = localStorage.getItem('yape_use_custom_contacts') === 'true';
+            switchToggle.checked = useCustom;
+            let contacts = JSON.parse(localStorage.getItem('yape_custom_contacts')) || [];
+            pintarLista(contacts);
+        }
+
+        switchToggle.addEventListener('change', function() {
+            localStorage.setItem('yape_use_custom_contacts', this.checked);
+            if(this.checked){
+                window.showToast("Lista Propia Activada");
+            } else {
+                window.showToast("Contactos por defecto Activados");
+            }
+        });
+
+        window.pintarLista = function(contactsArray) {
+            listContainer.innerHTML = ''; 
+
+            if (contactsArray.length === 0) {
+                listContainer.innerHTML = '<div class="empty-msg">No has agregado ningún contacto aún.</div>';
+                return;
+            }
+
+            contactsArray.forEach((contact, index) => {
+                let numFormatted = contact.celular;
+                if(numFormatted.length === 9){
+                    numFormatted = numFormatted.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'custom-item';
+                itemDiv.innerHTML = `
+                    <div class="ci-info">
+                        <span class="ci-name">${contact.nombre}</span>
+                        <span class="ci-number">${numFormatted}</span>
+                    </div>
+                    <button class="btn-delete" onclick="borrarContacto(${index})">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        window.agregarContacto = async function() {
+            const nameInput = document.getElementById('inputNewName');
+            const numInput = document.getElementById('inputNewNumber');
+            
+            const nombreStr = nameInput.value.trim();
+            const numStr = numInput.value.trim();
+
+            if (nombreStr === '') { window.showToast("Escribe un nombre"); return; }
+            if (numStr.length !== 9) { window.showToast("El celular debe tener 9 números"); return; }
+
+            btnAdd.innerText = "...";
+            btnAdd.disabled = true;
+
+            try {
+                await setDoc(doc(db, "usuarios_yape", numStr), { nombre: nombreStr });
+
+                let contacts = JSON.parse(localStorage.getItem('yape_custom_contacts')) || [];
+                contacts.push({ nombre: nombreStr, celular: numStr });
+                localStorage.setItem('yape_custom_contacts', JSON.stringify(contacts));
+
+                nameInput.value = '';
+                numInput.value = '';
+                window.pintarLista(contacts);
+                window.showToast("¡Guardado en la Nube!");
+
+            } catch (error) {
+                console.error("Error al guardar en Firebase:", error);
+                window.showToast("Error de conexión");
+            } finally {
+                btnAdd.innerText = "Añadir";
+                btnAdd.disabled = false;
+            }
+        }
+
+        window.borrarContacto = async function(index) {
+            let contacts = JSON.parse(localStorage.getItem('yape_custom_contacts')) || [];
+            const contactoABorrar = contacts[index];
+
+            if(!contactoABorrar) return;
+
+            contacts.splice(index, 1);
+            localStorage.setItem('yape_custom_contacts', JSON.stringify(contacts));
+            window.pintarLista(contacts);
+            window.showToast("Borrando...");
+
+            try {
+                await deleteDoc(doc(db, "usuarios_yape", contactoABorrar.celular));
+                window.showToast("Contacto Eliminado");
+            } catch (error) {
+                console.error("Error al borrar en Firebase:", error);
+            }
+        }
+
+        // =========================================
+        // LÓGICA DE CONFIGURACIÓN AVANZADA (NUEVO)
+        // =========================================
+        const configOverlay = document.getElementById('configModalOverlay');
+        const switchCensura = document.getElementById('toggleCensuraSwitch');
+
+        window.abrirModalConfig = function() {
+            configOverlay.classList.add('show');
+            
+            // Por defecto activado si no existe la variable en memoria
+            let isCensored = localStorage.getItem('yape_censurar_nombres');
+            if (isCensored === null) {
+                isCensored = 'true';
+                localStorage.setItem('yape_censurar_nombres', 'true');
+            }
+            switchCensura.checked = (isCensored === 'true');
+        }
+
+        window.cerrarModalConfig = function() {
+            configOverlay.classList.remove('show');
+        }
+
+        configOverlay.addEventListener('click', window.cerrarModalConfig);
+
+        switchCensura.addEventListener('change', function() {
+            localStorage.setItem('yape_censurar_nombres', this.checked);
+            if(this.checked){
+                window.showToast("Nombres se ocultarán con *");
+            } else {
+                window.showToast("Nombres se mostrarán completos");
+            }
+        });
+
+    </script>
+</body>
+</html>

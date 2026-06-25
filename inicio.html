@@ -1,0 +1,1402 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        localStorage.setItem('sesion_iniciada', 'true');
+        localStorage.setItem('pase_vip_activo', 'true');
+    }
+    </script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="img/favicon.png" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Yape</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --brand-header: #742385; 
+            --brand-teal: #00BFA5;
+            --bg-gray: #f2f4f6;
+            --main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Variables heredadas de yapear.html */
+            --brand-purple: #742284;
+            --brand-light-purple: #a86cc1;
+            --text-gray: #666;
+            --border-color: #eee;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--main-font);
+            background-color: white; 
+            color: #333;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100dvh;
+            background-color: white;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            background-color: var(--brand-header);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            flex-shrink: 0;
+            position: relative; 
+            z-index: 10;
+        }
+
+        .user-profile { display: flex; align-items: center; cursor: pointer; max-width: 65%; }
+        .profile-img { width: 24px; height: 25px; border-radius: 50%; object-fit: cover; margin-right: 8px; }
+        .user-name { font-weight: 500; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-actions { display: flex; align-items: center; }
+        .badge-gratis { background-color: #FFC107; color: #333; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-right: 12px; }
+        .header-icon-img { width: 24px; height: 24px; margin-left: 12px; cursor: pointer; object-fit: contain; }
+
+        /* --- SCROLL PRINCIPAL --- */
+        .main-scroll {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: white;
+            scrollbar-width: none;
+            margin-top: -1px; 
+        }
+        .main-scroll::-webkit-scrollbar { display: none; }
+
+        /* --- SECCIÓN MORADA --- */
+        .purple-section {
+            background: linear-gradient(180deg, #742385, #5B1B78, #5B1B78, #4D1A71);
+            padding-top: 5px;
+            padding-bottom: 40px; 
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px 4px; 
+            margin-bottom: 20px;
+            padding: 0 16px; 
+        }
+        .grid-item { display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
+        
+        .icon-circle { 
+            width: 58px; 
+            height: 58px; 
+            background-color: white; 
+            border-radius: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 6px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+            padding: 12px; 
+        }
+        .icon-circle img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        
+        .grid-label { 
+            font-size: 12px; 
+            font-weight: 400; 
+            line-height: 1.1; 
+            max-width: 80px;
+        }
+
+        /* Estilo modo borrar activo */
+        .delete-mode-active {
+            background-color: #FF5252 !important;
+            transform: scale(1.1);
+            border: 2px solid white;
+        }
+
+        /* --- CARRUSEL EFECTO "PEEK" --- */
+        .slider-container {
+            width: 70%; 
+            margin-left: 23px; 
+            margin-bottom: 12px;
+            position: relative;
+            flex-shrink: 0;
+            aspect-ratio: 415 / 182;
+            overflow: visible; 
+        }
+        
+        .slider-track { 
+            display: flex; 
+            width: 600%; 
+            height: 100%; 
+            transition: transform 0.3s ease-out; 
+        }
+        
+        .slide { 
+            width: 16.666667%; 
+            height: 100%; 
+            padding: 0; 
+            box-sizing: border-box; 
+            padding-right: 12px; 
+        }
+        
+        .banner-card { 
+            background-color: white; 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            position: relative; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+        }
+        
+        .banner-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
+        /* Puntos Animados */
+        .pagination { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            margin-top: 0px; 
+            margin-bottom: 0px; 
+            position: relative; 
+            z-index: 5;
+            height: 12px;
+        }
+        
+        .dot { 
+            width: 6px; 
+            height: 6px; 
+            background-color: rgba(255, 255, 255, 0.4); 
+            border-radius: 50%; 
+            margin: 0 4px; 
+        }
+
+        @keyframes growPill {
+            from { width: 6px; background-color: rgba(255, 255, 255, 0.4); border-radius: 50%; }
+            to { width: 24px; background-color: white; border-radius: 10px; }
+        }
+        @keyframes shrinkPill {
+            from { width: 24px; background-color: white; border-radius: 10px; }
+            to { width: 6px; background-color: rgba(255, 255, 255, 0.4); border-radius: 50%; }
+        }
+        
+        .dot.active { animation: growPill 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .dot.was-active { animation: shrinkPill 0.6s forwards cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+        /* --- SECCIÓN BLANCA --- */
+        .white-section {
+            background-color: white;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            margin-top: -25px; 
+            padding: 25px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; 
+            position: relative;
+            z-index: 2; 
+            min-height: 250px; 
+        }
+
+        .card-block {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+            flex: 0 0 auto; 
+            width: 100%; 
+        }
+
+        .card-header-toggle {
+            padding: 18px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background-color: white;
+            width: 100%; 
+        }
+
+        .action-left { display: flex; align-items: center; }
+        .action-icon-img { width: 24px; height: 24px; margin-right: 12px; object-fit: contain; }
+        
+        .action-text { color: #511973; font-weight: 600; font-size: 15px; }
+        
+        .balance-amount { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: #333; 
+            display: none; 
+        }
+        
+        .chevron { color: #666; font-size: 18px; transition: transform 0.3s ease; }
+
+        .movements-list {
+            display: none; 
+            border-top: none; 
+            padding: 0 16px 16px 16px;
+            background-color: white;
+            width: 100%;
+        }
+        
+        .movement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px 0; 
+            border-bottom: 1px solid #f0f0f0; 
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .movement-item.deletable-hover:active {
+            background-color: #ffebee; 
+        }
+
+        .mov-info { display: flex; flex-direction: column; gap: 4px; }
+        .mov-name { font-size: 16px; font-weight: 700; color: #333; } 
+        .mov-date { font-size: 14px; color: #999; }
+        
+        .mov-amount { font-size: 16px; font-weight: 600; text-align: right; }
+        .amount-red { color: #D32F2F; } 
+        .amount-black { color: #333; }   
+
+        .ver-todos-btn {
+            display: block;
+            text-align: center;
+            color: var(--brand-teal);
+            font-weight: 700;
+            font-size: 14px; 
+            padding-top: 20px;
+            padding-bottom: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+
+        .footer-spacer { flex-grow: 1; } 
+
+        .footer-buttons-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            padding-bottom: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 10px; 
+            border-radius: 8px;
+            font-weight: 600; 
+            font-size: 13.5px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            white-space: nowrap; 
+        }
+        
+        .btn-img-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            object-fit: contain;
+        }
+        
+        .btn-outline { border: 1.5px solid var(--brand-teal); color: var(--brand-teal); background-color: white; }
+        .btn-fill { background-color: var(--brand-teal); color: white; border: none; box-shadow: 0 4px 12px rgba(0, 191, 165, 0.3); }
+
+        /* --- MODALES --- */
+        .loader-overlay, .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
+            background-color: rgba(0,0,0,0.6); z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .loader-overlay.show, .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+        .loader-card {
+            background: white; width: 273px; height: 117px; border-radius: 12px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 0; 
+        }
+        .custom-spinner {
+            width: 38px; height: 38px; border: 4px solid #e0e0e0; border-top: 4px solid var(--brand-teal);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader-text { font-size: 16px; font-weight: 700; color: #333; line-height: 1.2; }
+
+        .modal-content { width: 90%; max-width: 380px; position: relative; transform: scale(0.8); transition: transform 0.3s; }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        .modal-close-btn { position: absolute; top: -12px; right: -8px; background-color: white; color: var(--brand-purple); width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .modal-content img { width: 100%; border-radius: 12px; display: block; }
+
+        /* --- MENU DESPLEGABLE "VER MÁS" --- */
+        .full-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f7f9fc; 
+            z-index: 5000;
+            transform: translateY(100%); 
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+        }
+
+        .full-menu-overlay.show {
+            transform: translateY(0); 
+        }
+
+        .menu-handle-container {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #f7f9fc;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            flex-shrink: 0;
+        }
+
+        .menu-handle {
+            width: 40px;
+            height: 4px;
+            background-color: #ccc;
+            border-radius: 2px;
+        }
+
+        .menu-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 40px 20px;
+        }
+
+        .menu-section-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 15px 0 15px 0;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 0px; 
+            margin-bottom: 20px;
+        }
+
+        .menu-grid .grid-item .grid-label {
+            color: #333;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        
+        .menu-grid .icon-circle {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        }
+        
+        .menu-icon-rounded {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 10px; 
+        }
+
+        /* =========================================
+           ESTILOS DEL PANEL DE PERFIL
+           ========================================= */
+        .perfil-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            background-color: white;
+            z-index: 2000;
+            transform: translateX(-100%); 
+            transition: transform 1s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .perfil-panel.show {
+            transform: translateX(0); 
+        }
+
+        .perfil-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background-color: white; flex-shrink: 0; }
+        .perfil-header-left { display: flex; align-items: center; }
+        .perfil-back-icon { font-size: 22px; color: #000; cursor: pointer; stroke-width: 20px; }
+        .perfil-title-header { font-size: 26px; font-weight: 700; color: #2d0d42; padding: 0 24px 10px 24px; flex-shrink: 0; }
+        .perfil-help-btn { background: #f3f4f6; border-radius: 25px; padding: 8px 18px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; color: #1a1a1a; cursor: pointer; }
+        .perfil-section-title { padding: 25px 24px 15px 24px; font-weight: 800; font-size: 17px; color: #000; letter-spacing: -0.3px; flex-shrink: 0; }
+        .perfil-menu-list { list-style: none; padding: 0; margin: 0; flex-shrink: 0; }
+        .perfil-menu-item { padding: 18px 24px; display: flex; align-items: center; border-bottom: 1px solid #e0e0e0; cursor: pointer; transition: background-color 0.1s; }
+        .perfil-menu-item:active { background-color: #f5f5f5; }
+        .perfil-menu-icon-img { width: 24px; height: 24px; margin-right: 18px; object-fit: contain; }
+        .perfil-menu-text { flex: 1; font-size: 18px; font-weight: 500; color: #0f0f0f; letter-spacing: 0.1px; }
+        .perfil-footer-section { background-color: #f2f4f6; padding: 30px 24px 50px 24px; margin-top: auto; border-top: 1px solid #e0e0e0; flex-shrink: 0; }
+        .perfil-version-info { font-size: 15px; color: #666; line-height: 1.5; margin-bottom: 30px; }
+        .perfil-version-info strong { font-weight: 700; color: #444; }
+        .perfil-footer-menu-item { display: flex; align-items: center; padding: 14px 0; cursor: pointer; }
+        .perfil-footer-icon-img { width: 22px; height: 22px; margin-right: 18px; opacity: 0.6; filter: grayscale(100%); }
+        .perfil-footer-menu-text { font-size: 15px; color: #555; font-weight: 400; }
+
+        /* =========================================
+           ESTILOS DEL PANEL YAPEAR ENCAPSULADOS
+           ========================================= */
+        #pantalla-yapear {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            background-color: white;
+            z-index: 2000;
+            display: none; /* Oculto por defecto, se mostrará al dar click */
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        #pantalla-yapear .top-bar { display: flex; align-items: center; padding: 15px 20px; background-color: white; width: 100%; flex-shrink: 0; }
+        #pantalla-yapear .close-btn { color: #555; font-size: 24px; text-decoration: none; margin-right: 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; }
+        #pantalla-yapear .page-title { font-size: 19px; font-weight: 700; color: #333; }
+        #pantalla-yapear .tabs { display: flex; width: 100%; border-bottom: 2px solid #f0f0f0; flex-shrink: 0; }
+        #pantalla-yapear .tab { flex: 1; text-align: center; padding: 14px 0; font-weight: 700; font-size: 15px; color: #999; cursor: pointer; position: relative; }
+        #pantalla-yapear .tab.active { color: var(--brand-purple); }
+        #pantalla-yapear .tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background-color: var(--brand-purple); }
+        #pantalla-yapear .search-section { padding: 15px 20px 10px 20px; width: 100%; flex-shrink: 0; }
+        #pantalla-yapear .search-box { position: relative; display: flex; align-items: center; width: 100%; }
+        #pantalla-yapear .search-icon { position: absolute; left: 15px; color: #888; font-size: 16px; pointer-events: none; }
+        #pantalla-yapear .search-input { width: 100%; padding: 12px 12px 12px 45px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-weight: 500; background-color: white; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.05); -webkit-appearance: none; }
+        #pantalla-yapear .search-input::placeholder { color: #aaa; font-weight: 400; }
+        #pantalla-yapear .contact-list { padding: 0 20px; width: 100%; flex: 1; overflow-y: auto; }
+        #pantalla-yapear .contact-item { padding: 16px 0; border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; cursor: pointer; width: 100%; }
+        #pantalla-yapear .contact-item:active { background-color: #fafafa; }
+        #pantalla-yapear .contact-name { font-weight: 700; font-size: 15px; color: #222; margin-bottom: 3px; }
+        #pantalla-yapear .contact-phone { font-size: 14px; color: #888; font-weight: 500; }
+        #pantalla-yapear .new-contact-container { padding: 20px; display: none; cursor: pointer; width: 100%; }
+        #pantalla-yapear .new-contact-container:active { background-color: #fafafa; }
+        #pantalla-yapear .new-contact-card { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; pointer-events: none; }
+        #pantalla-yapear .nc-info { display: flex; flex-direction: column; }
+        #pantalla-yapear .nc-title { font-size: 16px; font-weight: 700; color: #222; margin-bottom: 4px; }
+        #pantalla-yapear .nc-number { font-size: 15px; color: #888; font-weight: 500; }
+        #pantalla-yapear .nc-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        #pantalla-yapear .nc-icon img { width: 28px; height: 28px; object-fit: contain; }
+        #pantalla-yapear .nc-footer-msg { color: #999; font-size: 13px; border-top: 1px solid #f0f0f0; padding-top: 15px; text-align: center; }
+
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            background-color: rgba(0, 0, 0, 0.5); /* Sombra de fondo */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+        #splash-card {
+            background-color: white; /* Cuadrito blanco */
+            width: 260px;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Hacemos el spinner un poquito más grande solo para esta pantalla */
+        #splash-screen .custom-spinner {
+            width: 50px; 
+            height: 50px; 
+            border-width: 5px;
+        }
+
+        /* --- NUEVO: ESTILOS DE LA NOTIFICACIÓN FALSA --- */
+        .fake-notification {
+            position: fixed;
+            top: -150px; /* Oculta arriba por defecto */
+            left: 4%;
+            width: 92%;
+            background-color: white;
+            border-radius: 24px; /* Bordes muy redondeados como Android 13+ */
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            display: flex;
+            padding: 14px 16px;
+            z-index: 99999;
+            transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            align-items: center;
+            pointer-events: none; /* Que no interrumpa si el usuario toca la pantalla */
+        }
+
+        .fake-notification.show {
+            top: 15px; /* Baja a la pantalla */
+        }
+
+        .notif-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 14px;
+        }
+
+        .notif-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .notif-title {
+            font-weight: 700;
+            color: #111;
+            font-size: 15px;
+        }
+
+        .notif-time {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .notif-text {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="fake-notification" class="fake-notification">
+        <img src="img/icon-96x96.png" class="notif-icon" alt="Yape">
+        <div class="notif-content">
+            <div class="notif-header">
+                <span class="notif-title">Confirmación de pago</span>
+                <span class="notif-time">Ahora</span>
+            </div>
+            <div class="notif-text" id="notif-msg">¡Yape! ... te envio un pago por S/...</div>
+        </div>
+    </div>
+
+<div id="splash-screen">
+    <div id="splash-card">
+        <div class="custom-spinner"></div>
+    </div>
+</div>
+    <div class="app-container">
+        
+        <div class="header">
+            <div class="user-profile" onclick="abrirPerfil()">
+                <img src="img/iconoperfil.png" alt="Perfil" class="profile-img" onerror="this.src='https://via.placeholder.com/30/ffffff/742284?text=U'">
+                <span class="user-name" id="mainUserName">Hola, </span>
+            </div>
+            <div class="header-actions">
+                <div class="badge-gratis">Gratis</div>
+                <img src="img/soporte-icon.svg" alt="Soporte" class="header-icon-img">
+                <img src="img/campana-icon.svg" alt="Campana" class="header-icon-img" id="btnCampana">
+            </div>
+        </div>
+
+        <div class="main-scroll">
+            
+            <div class="purple-section">
+                <div class="icon-grid">
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono1.png" alt=""></div><span class="grid-label">Recargar celular</span></div>
+                    <div class="grid-item" onclick="window.location.href='servicios.html'"><div class="icon-circle"><img src="img/icono2.png" alt=""></div><span class="grid-label">Yapear servicios</span></div>
+                    <div class="grid-item"><div class="icon-circle" style="padding:0; overflow:hidden;"><img src="img/descarga.gif" alt="" style="width:100%; height:100%; object-fit:cover;"></div><span class="grid-label">Promos</span></div>
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono4.png" alt=""></div><span class="grid-label">Código aprobación</span></div>
+                    
+                    <div class="grid-item" onclick="generarPagoFalso()"><div class="icon-circle"><img src="img/icono5.png" alt=""></div><span class="grid-label">Créditos</span></div>
+                    
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono6.png" alt=""></div><span class="grid-label">Tienda</span></div>
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono7.png" alt=""></div><span class="grid-label">Dólares</span></div>
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono8.png" alt=""></div><span class="grid-label">Remesas</span></div>
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono9.png" alt=""></div><span class="grid-label">SOAT</span></div>
+                    <div class="grid-item"><div class="icon-circle"><img src="img/icono10.png" alt=""></div><span class="grid-label">Viajar en bus</span></div>
+                    
+                    <div class="grid-item" id="gamingBtn">
+                        <div class="icon-circle" id="gamingIconCircle"><img src="img/icono11.png" alt=""></div>
+                        <span class="grid-label">Gaming</span>
+                    </div>
+                    
+                    <div class="grid-item" id="verMasBtn">
+                        <div class="icon-circle" style="background:transparent; box-shadow:none; padding:0;">
+                            <img src="img/homeanim1.gif" alt="" style="width:100%; height:100%; object-fit:contain;">
+                        </div>
+                        <span class="grid-label">Ver más</span>
+                    </div>
+                </div>
+
+                <div class="slider-container" id="promoSlider">
+                    <div class="slider-track" id="sliderTrack">
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo1.jpg" alt=""></div></div>
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo2.jpg" alt=""></div></div>
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo3.jpg" alt=""></div></div>
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo5.jpg" alt=""></div></div>
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo6.jpg" alt=""></div></div>
+                        <div class="slide"><div class="banner-card"><img src="img/h_fondo4.jpg" alt=""></div></div>
+                    </div>
+                </div>
+                
+                <div class="pagination" id="pagination">
+                    <div class="dot active" data-index="0"></div><div class="dot" data-index="1"></div><div class="dot" data-index="2"></div>
+                    <div class="dot" data-index="3"></div><div class="dot" data-index="4"></div><div class="dot" data-index="5"></div>
+                </div>
+            </div>
+
+            <div class="white-section">
+                
+                <div class="card-block" id="balanceCard">
+                    <div class="card-header-toggle">
+                        <div class="action-left">
+                            <img src="img/ojo_abierto.webp" id="balanceIcon" class="action-icon-img" alt="Ojo">
+                            <span class="action-text" id="balanceText">Mostrar saldo</span>
+                        </div>
+                        <span class="balance-amount" id="balanceAmount">S/ 1,200.00</span>
+                    </div>
+                </div>
+                
+                <div class="card-block" id="movementsBlock">
+                    <div class="card-header-toggle" id="movementsToggle">
+                        <div class="action-left">
+                            <img src="img/icono_movimientos.png" class="action-icon-img" alt="Movimientos">
+                            <span class="action-text" id="moveText">Mostrar movimientos</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down chevron" id="moveIcon"></i>
+                    </div>
+
+                    <div id="movementsList" class="movements-list"></div>
+                </div>
+
+                <div class="footer-spacer"></div>
+
+                <div class="footer-buttons-container">
+                    <button class="btn btn-outline" onclick="window.location.href='escanear.html'">
+                        <img src="img/qr-icon.svg" class="btn-img-icon" alt=""> ESCANEAR QR
+                    </button>
+                    <a class="btn btn-fill" onclick="abrirYapear()">
+                        <img src="img/flecha-icon.svg" class="btn-img-icon" alt=""> YAPEAR
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="pantalla-perfil" class="perfil-panel">
+        <div class="perfil-header">
+            <div class="perfil-header-left">
+                <i class="fa-solid fa-arrow-left perfil-back-icon" onclick="cerrarPerfil()"></i>
+            </div>
+            <div class="perfil-help-btn">
+                <i class="fa-solid fa-headset"></i> Ayuda
+            </div>
+        </div>
+        
+        <div class="perfil-title-header">Mi Perfil</div>
+
+        <div class="perfil-section-title">Mi cuenta</div>
+        <ul class="perfil-menu-list">
+            <li class="perfil-menu-item" onclick="window.location.href='opciones.html'">
+                <img src="img/mp-datos-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Mis datos</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-qr-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Mi QR</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-direcciones-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Mis direcciones</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-eliminar-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Eliminar mi cuenta</div>
+            </li>
+        </ul>
+
+        <div class="perfil-section-title">Ajustes</div>
+        <ul class="perfil-menu-list">
+            <li class="perfil-menu-item">
+                <img src="img/mp-biometria-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Biometría digital</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-compras-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Compras por internet y POS</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-informacion-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Confirmación de yapeo alto</div>
+            </li>
+            <li class="perfil-menu-item">
+                <img src="img/mp-limites-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Límites Transaccionales</div>
+            </li>
+            <li class="perfil-menu-item" style="border-bottom: none;"> 
+                <img src="img/mp-notificaciones-icon.svg" class="perfil-menu-icon-img" alt="">
+                <div class="perfil-menu-text">Notificaciones por yapeo</div>
+            </li>
+        </ul>
+
+        <div class="perfil-footer-section">
+            <div class="perfil-version-info">
+                Versión Yape: 3.41.0<br>
+                Tipo de Cuenta: Yape con BCP<br>
+                BANCO DE CRÉDITO DEL PERÚ<br>
+                <strong>RUC: 20100047218</strong>
+            </div>
+
+            <div class="perfil-footer-menu-item">
+                <img src="img/terminos-icon.svg" class="perfil-footer-icon-img" alt="">
+                <span class="perfil-footer-menu-text">Términos y Condiciones</span>
+            </div>
+            
+            <div class="perfil-footer-menu-item">
+                <img src="img/politica-icon.svg" class="perfil-footer-icon-img" alt="">
+                <span class="perfil-footer-menu-text">Política de privacidad</span>
+            </div>
+            
+            <div class="perfil-footer-menu-item">
+                <img src="img/cerrar-cuenta-icon.svg" class="perfil-footer-icon-img" alt="">
+                <span class="perfil-footer-menu-text">Cerrar sesión</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="pantalla-yapear">
+        <div class="top-bar">
+            <div class="close-btn" onclick="cerrarYapear()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div class="page-title">Yapear a</div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">Contactos</div>
+            <div class="tab" onclick="window.location.href='editable.html'">Yapeos pendientes</div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="tel" id="searchInput" class="search-input" placeholder="Ingresa el celular o busca contacto" autocomplete="off" maxlength="9">
+            </div>
+        </div>
+
+        <div class="contact-list" id="contactList">
+            </div>
+
+        <div class="new-contact-container" id="newContactResult">
+            <div class="new-contact-card">
+                <div class="nc-info">
+                    <span class="nc-title">A nuevo celular</span>
+                    <span class="nc-number" id="dynamicNumber">999 999 999</span>
+                </div>
+                <div class="nc-icon">
+                    <img src="img/icono_yapear.png" alt="Yape" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid fa-paper-plane\' style=\'color:#742284; font-size: 24px;\'></i>'">
+                </div>
+            </div>
+            <div class="nc-footer-msg">
+                No necesitas guardarlo en tus contactos
+            </div>
+        </div>
+    </div>
+
+    <div id="fullMenuOverlay" class="full-menu-overlay">
+        <div class="menu-handle-container" id="menuHandle">
+            <div class="menu-handle"></div>
+        </div>
+        
+        <div class="menu-content">
+            
+            <div class="menu-section-title">Yapeos</div>
+            <div class="menu-grid">
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono1.png" alt=""></div><span class="grid-label">Recargar<br>celular</span></div>
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono2.png" alt=""></div><span class="grid-label">Yapear<br>servicios</span></div>
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono4.png" alt=""></div><span class="grid-label">Código de<br>aprobación</span></div>
+                
+                <div class="grid-item"><div class="icon-circle" style="padding:0; overflow:hidden;"><img src="img/prom-4.jpg" class="menu-icon-rounded" alt=""></div><span class="grid-label">Giro/retiro<br>de efectivo</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono7.png" alt=""></div><span class="grid-label">Dólares</span></div>
+            </div>
+
+            <div class="menu-section-title">Finanzas</div>
+            <div class="menu-grid">
+                <div class="grid-item" onclick="generarPagoFalso()"><div class="icon-circle"><img src="img/icono5.png" alt=""></div><span class="grid-label">Créditos</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/seguros-icon.svg" alt=""></div><span class="grid-label">Seguros</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono9.png" alt=""></div><span class="grid-label">SOAT</span></div>
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono8.png" alt=""></div><span class="grid-label">Remesas</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/aprende-yape-icon.svg" alt=""></div><span class="grid-label">Aprende<br>con Yape</span></div>
+            </div>
+
+            <div class="menu-section-title">Compras</div>
+            <div class="menu-grid">
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono10.png" alt=""></div><span class="grid-label">Viajar en<br>bus</span></div>
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono6.png" alt=""></div><span class="grid-label">Tienda</span></div>
+                
+                <div class="grid-item"><div class="icon-circle" style="padding:0; overflow:hidden;"><img src="img/prom-1.jpg" class="menu-icon-rounded" alt=""></div><span class="grid-label">Entradas</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/icono11.png" alt=""></div><span class="grid-label">Gaming</span></div>
+                
+                <div class="grid-item"><div class="icon-circle"><img src="img/promos-il-icon.svg" alt=""></div><span class="grid-label">Promos</span></div>
+                
+                <div class="grid-item"><div class="icon-circle" style="padding:0; overflow:hidden;"><img src="img/prom-6.jpg" class="menu-icon-rounded" alt=""></div><span class="grid-label">Delivery</span></div>
+                
+                <div class="grid-item"><div class="icon-circle" style="padding:0; overflow:hidden;"><img src="img/prom-3.jpg" class="menu-icon-rounded" alt=""></div><span class="grid-label">Pedir gas</span></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalPopup">
+        <div class="modal-content">
+            <div class="modal-close-btn" id="closeModal">X</div>
+            <img src="img/popup.png" alt="Promo" onerror="this.src='https://via.placeholder.com/350x450?text=Popup'">
+        </div>
+    </div>
+    
+    <div class="loader-overlay" id="loaderModal">  
+        <div class="loader-card">
+            <div class="custom-spinner"></div>
+            <div class="loader-text">Verifica tu conexión a<br>internet</div>
+        </div>
+    </div>
+        <div class="loader-overlay" id="loaderyapear">  
+        <div class="loader-card">
+            <div class="custom-spinner"></div>
+            <div class="loader-text"><br></div>
+        </div>
+    </div>
+    <script>
+        // --- 0. FUNCIONES DE APERTURA DE PANELES (PERFIL Y YAPEAR) ---
+        function abrirPerfil() {
+            document.getElementById('pantalla-perfil').classList.add('show');
+        }
+
+        function cerrarPerfil() {
+            document.getElementById('pantalla-perfil').classList.remove('show');
+        }
+
+        function abrirYapear() {
+            document.getElementById('pantalla-yapear').style.display = 'flex';
+            renderContacts(); // Dibuja la lista al abrir
+        }
+
+        function cerrarYapear() {
+            document.getElementById('pantalla-yapear').style.display = 'none';
+        }
+
+        // --- 1. LÓGICA DE YAPEAR (BÚSQUEDA Y VALIDACIÓN) ---
+        const searchInput = document.getElementById('searchInput');
+        const contactList = document.getElementById('contactList');
+        const newContactResult = document.getElementById('newContactResult');
+        const dynamicNumber = document.getElementById('dynamicNumber');
+
+        searchInput.addEventListener('input', function(e) {
+            let value = e.target.value;
+            const isNumericStart = /^\d/.test(value);
+
+            if (isNumericStart) {
+                let cleanValue = value.replace(/\D/g, ''); 
+                if (cleanValue.length > 9) {
+                    cleanValue = cleanValue.slice(0, 9);
+                }
+                e.target.value = cleanValue;
+
+                if (cleanValue.length === 9) {
+                    contactList.style.display = 'none'; 
+                    newContactResult.style.display = 'block'; 
+                    const formattedNumber = cleanValue.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+                    dynamicNumber.textContent = formattedNumber;
+                } else {
+                    contactList.style.display = 'block'; 
+                    newContactResult.style.display = 'none'; 
+                }
+            } else {
+                contactList.style.display = 'block';
+                newContactResult.style.display = 'none';
+            }
+        });
+
+        const loaderModal = document.getElementById('loaderModal'); // Variable global del modal
+
+        newContactResult.addEventListener('click', function() {
+            const rawNumber = searchInput.value.replace(/\D/g, '');
+            if(rawNumber.length === 9) {
+                loaderyapear.classList.add('show');
+                setTimeout(() => {
+                    window.location.href = 'monto.html?numero=' + rawNumber;
+                }, 3000);
+            } else {
+                searchInput.style.borderColor = 'red';
+                setTimeout(() => searchInput.style.borderColor = '#e0e0e0', 1000);
+            }
+        });
+
+        // --- NUEVA LÓGICA DE CONTACTOS DINÁMICOS ---
+        const defaultContactsArr = [
+            { nombre: "Armando Garcia", celular: "966346842" },
+            { nombre: "Jose Torres", celular: "983651056" },
+            { nombre: "Cristian Crisanto", celular: "922150468" },
+            { nombre: "Anghelo Huaman", celular: "977459001" },
+            { nombre: "Ernesto Villafuerte", celular: "976591314" },
+            { nombre: "Juana Diaz", celular: "956045770" },
+            { nombre: "Maria Magdalena", celular: "934014267" },
+            { nombre: "Piero Almanestar", celular: "921111379" }
+        ];
+
+        function renderContacts() {
+            const listContainer = document.getElementById('contactList');
+            listContainer.innerHTML = ''; 
+
+            const useCustom = localStorage.getItem('yape_use_custom_contacts') === 'true';
+            let currentContacts = [];
+
+            if (useCustom) {
+                currentContacts = JSON.parse(localStorage.getItem('yape_custom_contacts')) || [];
+                if (currentContacts.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align:center; padding: 30px 20px; color:#999; font-size:15px;">No tienes contactos guardados.</div>';
+                    return;
+                }
+            } else {
+                currentContacts = defaultContactsArr;
+            }
+
+            currentContacts.forEach(contact => {
+                let numRaw = contact.celular.replace(/\D/g, '');
+                let numFormatted = numRaw;
+                if(numRaw.length === 9) {
+                    numFormatted = numRaw.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'contact-item';
+                itemDiv.innerHTML = `
+                    <span class="contact-name">${contact.nombre}</span>
+                    <span class="contact-phone">${numFormatted}</span>
+                `;
+
+                itemDiv.onclick = function() {
+                    const loader = document.getElementById('loaderyapear');
+                    loader.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = 'monto.html?numero=' + numRaw;
+                    }, 3000);
+                };
+
+                listContainer.appendChild(itemDiv);
+            });
+        }
+        // Lo ejecutamos en la carga por si acaso
+        renderContacts();
+
+
+        // --- 2. LÓGICA DE MOVIMIENTOS Y MODO BORRAR ---
+        let isDeleteMode = false;
+        const gamingBtn = document.getElementById('gamingBtn');
+        const gamingIconCircle = document.getElementById('gamingIconCircle');
+        const movementsListContainer = document.getElementById('movementsList');
+
+        gamingBtn.addEventListener('click', () => {
+            isDeleteMode = !isDeleteMode;
+            if(isDeleteMode) {
+                gamingIconCircle.classList.add('delete-mode-active');
+            } else {
+                gamingIconCircle.classList.remove('delete-mode-active');
+            }
+            renderMovements();
+        });
+
+        function renderMovements() {
+            let movimientos = JSON.parse(localStorage.getItem('yape_movements')) || [];
+            movementsListContainer.innerHTML = '';
+
+            movimientos.slice(0, 7).forEach((mov, index) => {
+                const item = document.createElement('div');
+                item.className = 'movement-item';
+                if(isDeleteMode) item.classList.add('deletable-hover');
+
+                item.onclick = () => {
+                    if(isDeleteMode) {
+                        movimientos.splice(index, 1);
+                        localStorage.setItem('yape_movements', JSON.stringify(movimientos));
+                        renderMovements();
+                    } else {
+                        let rawNum = mov.numero || "999";
+                        let isQr = isNaN(rawNum.replace(/\s/g, '')); 
+                        let mostrarCelular = mov.mostrar_celular || "asteriscos"; // <-- AÑADIDO
+                        const url = `exito.html?monto=${mov.monto}&nombre=${encodeURIComponent(mov.nombre)}&fecha=${encodeURIComponent(mov.fechaSolo || '')}&hora=${encodeURIComponent(mov.horaSolo || '')}&numero=${encodeURIComponent(rawNum)}&operacion=${mov.operacion || '00000000'}&codigo=${mov.codigo || '000'}&mensaje=${encodeURIComponent(mov.mensaje || '')}&destino=${encodeURIComponent(mov.destino || 'Yape')}&tipo=${mov.tipo || 'gasto'}&es_qr=${isQr}&mostrar_celular=${mostrarCelular}`; // <-- AÑADIDO
+                        window.location.href = url;
+                    }
+                };
+
+                let amountClass = 'amount-red'; 
+                let sign = '- ';
+                if (mov.tipo === 'ingreso') {
+                    amountClass = 'amount-black';
+                    sign = ' '; 
+                }
+
+                let nombreMostrado = mov.nombre;
+                const partes = mov.nombre.split(" ");
+                if (partes.length > 1) {
+                    nombreMostrado = `${partes[0]} ${partes[1].substring(0, 3)}*`;
+                }
+
+                // --- Lógica añadida para Mostrar "Destino - Nombre*" ---
+                let destinoHistorial = mov.destino || "Yape";
+                if (destinoHistorial !== "Yape") {
+                    nombreMostrado = `${destinoHistorial} - ${nombreMostrado}`;
+                }
+
+                item.innerHTML = `
+                    <div class="mov-info">
+                        <span class="mov-name">${nombreMostrado}</span>
+                        <span class="mov-date">${mov.fecha}</span>
+                    </div>
+                    <span class="mov-amount ${amountClass}">${sign}S/ ${parseFloat(mov.monto).toFixed(2)}</span>
+                `;
+                movementsListContainer.appendChild(item);
+            });
+
+            const verTodos = document.createElement('a');
+            verTodos.className = 'ver-todos-btn';
+            verTodos.textContent = 'VER TODOS';
+            movementsListContainer.appendChild(verTodos);
+        }
+
+        renderMovements();
+
+        // --- 3. INICIALIZACIÓN GENERAL ---
+        // Se hace global para poder acceder desde la notificación falsa
+        let isBalanceVisible = false; 
+
+        window.addEventListener('load', () => {
+            // Ocultar la pantalla de carga después de 1.5 segundos
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash) {
+                    splash.style.opacity = '0'; // Comienza a desvanecerse
+                    setTimeout(() => splash.style.display = 'none', 400); // Lo quita por completo para que puedas dar clics
+                }
+            }, 1500); // Puedes cambiar este 1500 (1.5 seg) por el tiempo que quieras
+            const savedName = localStorage.getItem('yape_name');
+            let savedBalance = localStorage.getItem('yape_balance');
+            
+            if (!savedBalance) {
+                savedBalance = "1200.00"; 
+                localStorage.setItem('yape_balance', savedBalance);
+            }
+
+            if (savedName) document.getElementById('mainUserName').textContent = "Hola, " + savedName;
+            
+            if (savedBalance) {
+                const cleanBalance = savedBalance.replace(/,/g, '');
+                const numberBalance = parseFloat(cleanBalance);
+                if (!isNaN(numberBalance)) {
+                    const formatted = numberBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    document.getElementById('balanceAmount').textContent = "S/ " + formatted;
+                } else {
+                    document.getElementById('balanceAmount').textContent = "S/ " + savedBalance;
+                }
+            }
+            
+            const showPopup = localStorage.getItem('yape_show_popup');
+            if (showPopup !== 'false') {
+                setTimeout(() => { document.getElementById('modalPopup').classList.add('show'); }, 500);
+            }
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modalPopup').classList.remove('show');
+        });
+
+        const btnCampana = document.getElementById('btnCampana');
+        btnCampana.addEventListener('click', () => { loaderModal.classList.add('show'); });
+        
+        // Evitamos que al dar click dentro del loader, se cierre de golpe
+        loaderModal.addEventListener('click', () => { loaderModal.classList.remove('show'); });
+
+        const balanceCard = document.getElementById('balanceCard');
+        const balanceIcon = document.getElementById('balanceIcon');
+        const balanceText = document.getElementById('balanceText');
+        const balanceAmount = document.getElementById('balanceAmount');
+
+            balanceCard.addEventListener('click', () => {
+            isBalanceVisible = !isBalanceVisible;
+            if (isBalanceVisible) {
+                balanceText.textContent = "Ocultar saldo";
+                balanceIcon.src = 'img/ojo_cerrado.png'; 
+                
+                // --- NUEVO: Leer y formatear el saldo actualizado desde la memoria ---
+                let saldoFresco = localStorage.getItem('yape_balance') || "1200.00";
+                let numeroFresco = parseFloat(saldoFresco.replace(/,/g, ''));
+                if (!isNaN(numeroFresco)) {
+                    balanceAmount.textContent = "S/ " + numeroFresco.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+                // ----------------------------------------------------------------------
+                
+                balanceAmount.style.display = 'block';
+            } else {
+                balanceText.textContent = "Mostrar saldo";
+                balanceIcon.src = 'img/ojo_abierto.png';
+                balanceAmount.style.display = 'none';
+            }
+        });
+
+        const movementsToggle = document.getElementById('movementsToggle');
+        const moveText = document.getElementById('moveText');
+        const moveIcon = document.getElementById('moveIcon');
+        let isMovementsVisible = false;
+
+        movementsToggle.addEventListener('click', () => {
+            isMovementsVisible = !isMovementsVisible;
+            if (isMovementsVisible) {
+                movementsListContainer.style.display = 'block';
+                moveText.textContent = "Ocultar movimientos";
+                moveIcon.classList.remove('fa-chevron-down');
+                moveIcon.classList.add('fa-chevron-up');
+            } else {
+                movementsListContainer.style.display = 'none';
+                moveText.textContent = "Mostrar movimientos";
+                moveIcon.classList.remove('fa-chevron-up');
+                moveIcon.classList.add('fa-chevron-down');
+            }
+        });
+
+        // --- 4. LÓGICA DEL SLIDER / CARRUSEL ---
+        const track = document.getElementById('sliderTrack');
+        const dots = document.querySelectorAll('.dot');
+        const sliderContainer = document.getElementById('promoSlider');
+        let index = 0; const totalSlides = 6; let slideInterval; let startX = 0;
+        let prevIndex = 0;
+
+        function updateSlider() {
+            track.style.transform = `translateX(-${index * (100 / totalSlides)}%)`;
+            dots.forEach(d => {
+                d.classList.remove('active');
+                d.classList.remove('was-active');
+            });
+            if (prevIndex !== index && dots[prevIndex]) {
+                 dots[prevIndex].classList.add('was-active');
+            }
+            dots[index].classList.add('active');
+            prevIndex = index;
+        }
+        
+        function nextSlide() {
+            prevIndex = index;
+            index = (index + 1) % totalSlides;
+            updateSlider();
+        }
+        
+        function startAutoSlide() { slideInterval = setInterval(nextSlide, 4000); }
+        function stopAutoSlide() { clearInterval(slideInterval); }
+        startAutoSlide();
+
+        sliderContainer.addEventListener('touchstart', e => { stopAutoSlide(); startX = e.touches[0].clientX; }, {passive: true});
+        sliderContainer.addEventListener('touchmove', e => {
+            const diff = e.touches[0].clientX - startX;
+            track.style.transform = `translateX(calc(-${index * (100/totalSlides)}% + ${diff}px))`;
+        }, {passive: true});
+        
+        sliderContainer.addEventListener('touchend', e => {
+            const diff = e.changedTouches[0].clientX - startX;
+            if (diff < -50 || diff > 50) { 
+                prevIndex = index; 
+                if (diff < -50) index = (index + 1) % totalSlides;
+                else if (diff > 50) index = (index - 1 + totalSlides) % totalSlides;
+                updateSlider();
+                startAutoSlide();
+            } else {
+                 startAutoSlide(); 
+            }
+        });
+
+        // --- 5. LÓGICA DEL MENÚ DESPLEGABLE ---
+        const verMasBtn = document.getElementById('verMasBtn');
+        const fullMenuOverlay = document.getElementById('fullMenuOverlay');
+        const menuHandle = document.getElementById('menuHandle');
+
+        verMasBtn.addEventListener('click', () => {
+            fullMenuOverlay.classList.add('show');
+        });
+
+        menuHandle.addEventListener('click', () => {
+            fullMenuOverlay.classList.remove('show');
+        });
+
+        let startY = 0;
+        let currentTranslate = 0;
+
+        menuHandle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            fullMenuOverlay.style.transition = 'none';
+        }, {passive: true});
+
+        menuHandle.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+
+            if (diff > 0) {
+                fullMenuOverlay.style.transform = `translateY(${diff}px)`;
+                currentTranslate = diff;
+            }
+        }, {passive: true});
+
+        menuHandle.addEventListener('touchend', () => {
+            fullMenuOverlay.style.transition = 'transform 0.4s ease-out';
+
+            if (currentTranslate > 100) {
+                fullMenuOverlay.classList.remove('show');
+                setTimeout(() => { fullMenuOverlay.style.transform = ''; }, 400);
+            } else {
+                fullMenuOverlay.style.transform = 'translateY(0)';
+            }
+            currentTranslate = 0;
+        });
+
+        // --- 6. MAGIA DEL FALSO PAGO PUSH (NUEVO) ---
+        let isNotifying = false;
+
+        function generarPagoFalso() {
+            if (isNotifying) return; // Evita spam si presionan varias veces
+            isNotifying = true;
+
+            // Listas para crear un nombre creíble
+            const nombres = ["Juan", "Maria", "Carlos", "Ana", "Luis", "Jorge", "Lucia", "Diego", "Valeria", "Maikol", "Jose", "Cristian", "Armando", "Pedro", "Sofia"];
+            const apellidos = ["Perez", "Garcia", "Torres", "Rojas", "Flores", "Sanchez", "Diaz", "Chavez", "Gomez", "Huaman", "Crisanto", "Gonzales", "Ramirez"];
+            
+            const nRandom = nombres[Math.floor(Math.random() * nombres.length)];
+            const aRandom = apellidos[Math.floor(Math.random() * apellidos.length)];
+            const nombreCompleto = nRandom + " " + aRandom;
+
+            // Generar Monto (100.00 a 500.00)
+            const montoRandom = (Math.random() * (500 - 100) + 100).toFixed(2);
+
+            // Cerrar menú inferior si estaba abierto
+            fullMenuOverlay.classList.remove('show');
+            setTimeout(() => { fullMenuOverlay.style.transform = ''; }, 400);
+
+            // 1. Mostrar Notificación Visual
+            const notifText = document.getElementById('notif-msg');
+            notifText.innerText = `¡Yape! ${nombreCompleto} te envio un pago por S/ ${montoRandom}`;
+            
+            const notifBanner = document.getElementById('fake-notification');
+            notifBanner.classList.add('show');
+            
+            // Reproducir sonido
+            const sound = new Audio('img/ysnid.mp3');
+            sound.play().catch(e => console.log("Navegador bloqueó el audio", e));
+
+            // Esconder la notificación tras 4 segundos
+            setTimeout(() => {
+                notifBanner.classList.remove('show');
+                isNotifying = false;
+            }, 4000);
+
+            // 2. Afectar el Saldo
+            let savedBalance = localStorage.getItem('yape_balance') || "1200.00";
+            let cleanBalance = parseFloat(savedBalance.replace(/,/g, ''));
+            if(isNaN(cleanBalance)) cleanBalance = 0;
+            
+            let newBalance = cleanBalance + parseFloat(montoRandom);
+            let formattedNewBalance = newBalance.toFixed(2);
+            localStorage.setItem('yape_balance', formattedNewBalance);
+
+            // Reflejar en pantalla si el ojo está abierto
+            if (isBalanceVisible) {
+                document.getElementById('balanceAmount').textContent = "S/ " + newBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // 3. Afectar el Historial y preparar el Voucher
+            let movimientos = JSON.parse(localStorage.getItem('yape_movements')) || [];
+            
+            // Helper para obtener fecha y hora real del celular
+            const now = new Date();
+            const mesesStr = ["ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "sep.", "oct.", "nov.", "dic."];
+            const mesFormat = mesesStr[now.getMonth()];
+            
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'p. m.' : 'a. m.';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            const fechaLarga = `${now.getDate()} ${mesFormat} ${now.getFullYear()}`;
+            const horaString = `${hours < 10 ? '0'+hours : hours}:${minutes} ${ampm}`;
+            const fechaCorta = `${now.getDate()} ${mesFormat}`;
+
+            const numeroCelularRandom = "9" + Math.floor(10000000 + Math.random() * 90000000);
+            const numOpRandom = Math.floor(10000000 + Math.random() * 90000000).toString();
+            const codigoRandom = numOpRandom.slice(-3);
+
+            let nuevoIngreso = {
+                monto: montoRandom,
+                nombre: nombreCompleto,
+                fecha: `${fechaLarga} - ${horaString}`,
+                fechaSolo: fechaLarga,
+                horaSolo: horaString,
+                tipo: 'ingreso',
+                numero: numeroCelularRandom,
+                operacion: numOpRandom,
+                codigo: codigoRandom,
+                destino: 'Yape',
+                mostrar_celular: 'asteriscos',
+                mensaje: ''
+            };
+
+            movimientos.unshift(nuevoIngreso);
+            localStorage.setItem('yape_movements', JSON.stringify(movimientos));
+            renderMovements(); // Vuelve a dibujar la lista
+        }
+
+    </script>
+</body>
+</html>

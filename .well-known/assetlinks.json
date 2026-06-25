@@ -1,0 +1,1 @@
+﻿{ "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "app.vercel.hyton.twa", "sha256_cert_fingerprints": ["09:E2:96:2D:98:00:63:58:3D:3C:17:51:CE:B3:11:72:64:82:50:B8:A9:77:74:AA:45:D2:D8:5B:DD:7F:88:94"] } }

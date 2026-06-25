@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script type="module" src="seguridad.js"></script>
+    <script>
+    if (!localStorage.getItem('sesion_iniciada')) {
+        window.location.href = 'index.html';
+    }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sobre esto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-purple: #742385;
+            --brand-dark-purple: #511973;
+            --brand-teal: #00BFA5;
+            --bg-gray: #f2f4f6;
+            --text-dark: #333;
+        }
+
+        /* QUITAMOS EL AZUL AL DAR CLICK GLOBALMENTE */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none; 
+        }
+
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-gray); 
+            color: var(--text-dark); 
+            height: 100vh;
+            overflow-y: auto; /* Permitir scroll si la pantalla es pequeña */
+        }
+
+        .container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+        }
+
+        /* HEADER LLAMATIVO */
+        .header-hero {
+            background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-dark-purple) 100%);
+            height: 200px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(81, 25, 115, 0.3);
+            flex-shrink: 0;
+        }
+
+        .back-icon {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .back-icon:active { background: rgba(255,255,255,0.4); }
+
+        .logo-icon {
+            font-size: 60px;
+            color: white;
+            margin-top: -20px;
+            opacity: 0.9;
+        }
+
+        /* TARJETA FLOTANTE */
+        .info-card {
+            background: white;
+            margin: -50px 20px 20px 20px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .version-badge {
+            background-color: var(--brand-teal);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 191, 165, 0.3);
+        }
+
+        .main-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--brand-dark-purple);
+            margin: 0 0 5px 0;
+        }
+
+        .update-text {
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        /* CAJA DE IMPORTANTE */
+        .important-box {
+            background-color: #FFF8E1;
+            border-left: 4px solid #FFC107;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .important-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #F57F17;
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .important-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #5D4037;
+        }
+
+        /* NUEVA SECCIÓN DE BOTONES */
+        .new-section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--brand-dark-purple);
+            margin-top: 30px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .new-section-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .btn-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-link:active { transform: scale(0.98); }
+
+        .btn-telegram {
+            background-color: #2CA5E0; /* Color Telegram */
+            color: white;
+        }
+        
+        .btn-support {
+            background-color: #333;
+            color: white;
+        }
+
+        .btn-icon { margin-right: 8px; font-size: 18px; }
+
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header-hero">
+            <i class="fa-solid fa-arrow-left back-icon" onclick="window.history.back()"></i>
+            <i class="fa-solid fa-code logo-icon"></i>
+        </div>
+
+        <div class="info-card">
+            
+            <div class="version-badge">Versión 1.5 AccesoPremium</div>
+            
+            <h1 class="main-title">Proyecto Yapeton</h1>
+            
+            <div class="update-text">
+                <i class="fa-regular fa-clock"></i> Ultima Actualización: 19/04/26 | V 2.0 OFICIAL
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <div class="important-box">
+                <div class="important-header">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    IMPORTANTE:
+                </div>
+                <div class="important-text">
+                    Asegúrense de configurar el zoom de la pagina para que se vea como una app nativa, solo háganlo si no se ve bien, para más info consulta a tu vendedor.
+                </div>
+            </div>
+
+            <div class="new-section-title">FUNCIONES MEJORADAS Y NUEVAS</div>
+            <div class="new-section-desc">Unete al grupo oficial para que te enteres de todo,</div>
+
+            <a href="https://t.me/appsreborn" target="_blank" class="btn-link btn-telegram">
+                <i class="fa-brands fa-telegram btn-icon"></i> CLICK AQUI
+            </a>
+
+            <a href="https://t.me/MaikolEsleiter" target="_blank" class="btn-link btn-support">
+                <i class="fa-solid fa-headset btn-icon"></i> SOPORTE
+            </a>
+
+        </div>
+
+        <div class="footer">
+            FIN
+        </div>
+
+    </div>
+</body>
+</html>
