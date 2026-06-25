@@ -1,5 +1,5 @@
 const GH_TOKEN = process.env.GH_TOKEN;
-const GH_REPO = process.env.GH_REPO || 'mathiascaba/yape-clon';
+const GH_REPO = process.env.GH_REPO || 'mathiascaba/yopo-v1';
 const GH_PATH = process.env.GH_FILE_PATH || 'data/activacion.json';
 const GH_BRANCH = process.env.GH_BRANCH || 'main';
 
