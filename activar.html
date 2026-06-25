@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Activar Yape</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #742385 0%, #511973 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.card { background: white; border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+.logo { width: 72px; height: 72px; background: #742385; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px; color: white; }
+h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
+.sub { color: #888; font-size: 14px; margin-bottom: 28px; }
+.input-group { position: relative; margin-bottom: 20px; }
+.input-group input { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 20px; text-align: center; letter-spacing: 6px; font-weight: 600; outline: none; transition: border-color .3s; text-transform: uppercase; }
+.input-group input:focus { border-color: #742385; }
+.input-group label { display: block; text-align: left; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+.btn { width: 100%; padding: 14px; background: #742385; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background .3s, transform .1s; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { background: #ccc; cursor: not-allowed; }
+.error { color: #d32f2f; font-size: 13px; margin-top: 12px; display: none; }
+.success { color: #2e7d32; font-size: 13px; margin-top: 12px; display: none; }
+.loader { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; margin: 0 auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><i class="fas fa-shield-alt"></i></div>
+  <h1>Activar Dispositivo</h1>
+  <p class="sub">Ingresa el codigo de activacion que recibiste</p>
+
+  <div class="input-group">
+    <label>Codigo de activacion</label>
+    <input type="text" id="codigoInput" maxlength="8" placeholder="XXXXXXXX" autocomplete="off">
+  </div>
+
+  <button class="btn" id="btnActivar" onclick="activar()">
+    <span id="btnText">Activar</span>
+    <div class="loader" id="btnLoader"></div>
+  </button>
+
+  <div class="error" id="errorMsg"></div>
+  <div class="success" id="successMsg"></div>
+</div>
+
+<script>
+function getDeviceId() {
+  let id = localStorage.getItem('device_id');
+  if (!id) {
+    id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    localStorage.setItem('device_id', id);
+  }
+  return id;
+}
+
+async function activar() {
+  const codigo = document.getElementById('codigoInput').value.trim().toUpperCase();
+  if (codigo.length < 8) {
+    mostrarError('Ingresa un codigo de 8 caracteres');
+    return;
+  }
+
+  const btn = document.getElementById('btnActivar');
+  const btnText = document.getElementById('btnText');
+  const btnLoader = document.getElementById('btnLoader');
+
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoader.style.display = 'block';
+  ocultarError();
+
+  try {
+    const res = await fetch('/api/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo, dispositivo: getDeviceId() })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      document.getElementById('successMsg').style.display = 'block';
+      document.getElementById('successMsg').textContent = '¡Dispositivo activado con exito! Redirigiendo...';
+      localStorage.setItem('activado', 'true');
+      setTimeout(() => window.location.href = 'inicio.html', 1500);
+    } else {
+      mostrarError(data.error || 'Error al activar');
+    }
+  } catch (e) {
+    mostrarError('Error de conexion');
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoader.style.display = 'none';
+  }
+}
+
+function mostrarError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function ocultarError() {
+  document.getElementById('errorMsg').style.display = 'none';
+}
+
+document.getElementById('codigoInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') activar();
+});
+</script>
+</body>
+</html>
