@@ -55,9 +55,12 @@
       "fecha_uso": "2026-06-26T14:52:33.724Z"
     },
     "Z6L942O3": {
-      "used": false,
+      "used": true,
       "blocked": false,
-      "creado": "2026-06-26T22:02:52.739Z"
+      "creado": "2026-06-26T22:02:52.739Z",
+      "dispositivo": "e4dfc934-9789-4133-92a8-3e9a9ff088e3",
+      "fecha_uso": "2026-06-26T22:04:11.143Z",
+      "nombre": "iPhone"
     }
   },
   "dispositivos": [
@@ -70,6 +73,12 @@
       "id": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
       "codigo": "RI36ADST",
       "fecha": "2026-06-26T14:52:33.724Z"
+    },
+    {
+      "id": "e4dfc934-9789-4133-92a8-3e9a9ff088e3",
+      "codigo": "Z6L942O3",
+      "fecha": "2026-06-26T22:04:11.143Z",
+      "nombre": "iPhone"
     }
   ],
   "intentos_fallidos": [
