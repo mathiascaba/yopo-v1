@@ -49,6 +49,7 @@ h1 { color: #333; font-size: 22px; margin-bottom: 6px; }
     <i class="fas fa-ban" style="font-size:48px;color:#d32f2f;display:block;margin-bottom:12px"></i>
     <div style="font-size:20px;font-weight:800;color:#d32f2f;text-transform:uppercase;letter-spacing:1px">Codigo de activacion bloqueado</div>
     <div style="font-size:14px;color:#888;margin-top:8px">Contactar a soporte</div>
+    <button class="btn" style="margin-top:20px" onclick="mostrarFormulario()">Ingresar nuevo codigo</button>
   </div>
   <div class="success" id="successMsg"></div>
 </div>
@@ -147,6 +148,13 @@ function mostrarErrorBig(msg) {
   const el = document.getElementById('errorBigMsg');
   el.textContent = msg;
   el.style.display = 'block';
+}
+
+function mostrarFormulario() {
+  document.getElementById('bloqueadoMsg').style.display = 'none';
+  document.querySelector('.input-group').style.display = 'block';
+  document.getElementById('btnActivar').style.display = 'block';
+  document.getElementById('errorBigMsg').style.display = 'none';
 }
 
 function ocultarError() {

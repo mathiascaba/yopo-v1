@@ -39,6 +39,7 @@ module.exports = async (req, res) => {
     codeData.fecha_uso = new Date().toISOString();
 
     if (!contenido.dispositivos) contenido.dispositivos = [];
+    contenido.dispositivos = contenido.dispositivos.filter(d => d.id !== dispositivo);
     contenido.dispositivos.push({ id: dispositivo, codigo, fecha: new Date().toISOString() });
 
     await guardar(contenido, sha);
