@@ -214,11 +214,10 @@ async function cargarDispositivos() {
     return;
   }
   count.textContent = `(${data.dispositivos.length})`;
-  let html = '<table><tr><th>Nombre</th><th>ID</th><th>Codigo</th><th>Fecha</th><th>Ubicacion</th></tr>';
+  let html = '<table><tr><th>Nombre</th><th>ID</th><th>Codigo</th><th>Fecha</th></tr>';
   data.dispositivos.forEach(d => {
     const name = d.nombre || '-';
-    const ubi = d.ubicacion ? `${d.ubicacion.lat.toFixed(4)}, ${d.ubicacion.lng.toFixed(4)}` : '-';
-    html += `<tr><td>${name}</td><td><code style="font-size:11px">${d.id}</code></td><td>${d.codigo}</td><td>${new Date(d.fecha).toLocaleString()}</td><td>${ubi}</td></tr>`;
+    html += `<tr><td>${name}</td><td><code style="font-size:11px">${d.id}</code></td><td>${d.codigo}</td><td>${new Date(d.fecha).toLocaleString()}</td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;
