@@ -48,9 +48,11 @@
       "fecha_uso": "2026-06-26T14:48:37.376Z"
     },
     "RI36ADST": {
-      "used": false,
+      "used": true,
       "blocked": false,
-      "creado": "2026-06-26T14:52:29.321Z"
+      "creado": "2026-06-26T14:52:29.321Z",
+      "dispositivo": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
+      "fecha_uso": "2026-06-26T14:52:33.724Z"
     }
   },
   "dispositivos": [
@@ -61,8 +63,8 @@
     },
     {
       "id": "6d6cee6d-45e4-41e0-a3a8-ef5bfb0e0997",
-      "codigo": "IV5UQGV0",
-      "fecha": "2026-06-26T14:48:37.376Z"
+      "codigo": "RI36ADST",
+      "fecha": "2026-06-26T14:52:33.724Z"
     }
   ],
   "intentos_fallidos": [
