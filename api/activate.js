@@ -31,9 +31,6 @@ module.exports = async (req, res) => {
         codeData.blocked = true;
       }
       await guardar(contenido, sha);
-      if (!mismoDispositivo) {
-        return res.status(400).json({ error: 'Codigo bloqueado' });
-      }
       return res.status(400).json({ error: 'Codigo ya usado' });
     }
 
