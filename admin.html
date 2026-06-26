@@ -184,7 +184,7 @@ async function cargarCodigos() {
     return;
   }
   count.textContent = `(${data.codigos.length})`;
-  let html = '<table><tr><th>Codigo</th><th>Estado</th><th>Dispositivo</th><th>Fecha uso</th><th>Accion</th></tr>';
+  let html = '<table><tr><th>Codigo</th><th>Estado</th><th>Dispositivo</th><th>Nombre</th><th>Fecha uso</th><th>Accion</th></tr>';
   data.codigos.forEach(c => {
     let badge;
     if (c.blocked) badge = '<span class="badge badge-blocked">Bloqueado</span>';
@@ -198,7 +198,7 @@ async function cargarCodigos() {
       accion = `<button class="btn btn-sm btn-danger" onclick="bloquear('${c.codigo}')">Bloquear</button>`;
     }
 
-    html += `<tr><td><code>${c.codigo}</code></td><td>${badge}</td><td>${c.dispositivo || '-'}</td><td>${c.fecha_uso ? new Date(c.fecha_uso).toLocaleString() : '-'}</td><td>${accion}</td></tr>`;
+    html += `<tr><td><code>${c.codigo}</code></td><td>${badge}</td><td>${c.dispositivo || '-'}</td><td>${c.nombre || '-'}</td><td>${c.fecha_uso ? new Date(c.fecha_uso).toLocaleString() : '-'}</td><td>${accion}</td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;
@@ -214,9 +214,11 @@ async function cargarDispositivos() {
     return;
   }
   count.textContent = `(${data.dispositivos.length})`;
-  let html = '<table><tr><th>Dispositivo</th><th>Codigo</th><th>Fecha</th></tr>';
+  let html = '<table><tr><th>Nombre</th><th>ID</th><th>Codigo</th><th>Fecha</th><th>Ubicacion</th></tr>';
   data.dispositivos.forEach(d => {
-    html += `<tr><td><code style="font-size:11px">${d.id}</code></td><td>${d.codigo}</td><td>${new Date(d.fecha).toLocaleString()}</td></tr>`;
+    const name = d.nombre || '-';
+    const ubi = d.ubicacion ? `${d.ubicacion.lat.toFixed(4)}, ${d.ubicacion.lng.toFixed(4)}` : '-';
+    html += `<tr><td>${name}</td><td><code style="font-size:11px">${d.id}</code></td><td>${d.codigo}</td><td>${new Date(d.fecha).toLocaleString()}</td><td>${ubi}</td></tr>`;
   });
   html += '</table>';
   container.innerHTML = html;

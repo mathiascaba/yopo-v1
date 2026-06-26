@@ -93,6 +93,27 @@ function getDeviceId() {
   return id;
 }
 
+function getDeviceName() {
+  const ua = navigator.userAgent;
+  const match = ua.match(/Android\s[\d.]+;\s([^;]+)/);
+  if (match) return match[1].trim();
+  try {
+    if (navigator.platform) return navigator.platform;
+  } catch(e) {}
+  return 'Desconocido';
+}
+
+function getUbicacion() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => resolve(null),
+      { timeout: 5000, enableHighAccuracy: false }
+    );
+  });
+}
+
 async function activar() {
   const codigo = document.getElementById('codigoInput').value.trim().toUpperCase();
   if (codigo.length < 8) {
@@ -110,10 +131,16 @@ async function activar() {
   ocultarError();
 
   try {
+    const [ubicacion] = await Promise.all([getUbicacion()]);
     const res = await fetch('/api/activate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigo, dispositivo: getDeviceId() })
+      body: JSON.stringify({
+        codigo,
+        dispositivo: getDeviceId(),
+        nombre: getDeviceName(),
+        ubicacion
+      })
     });
     const data = await res.json();
 
